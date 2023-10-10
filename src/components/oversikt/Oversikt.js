@@ -143,52 +143,6 @@ const Oversikt = (props) => {
     });
   };
 
-  const handleSaksomkostning1 = (personType, botId) => {
-    const botEntry = data.find((bot) => bot.id === botId);
-    const person =
-      personType === "forbryter" ? botEntry.brutt : botEntry.melder;
-
-    // Define the new bot to be added
-    const newBot = {
-      // Adjust these properties as necessary
-      id: Date.now(), // a simple unique identifier
-      brutt: person,
-      melder: "System", // Just an example, you can set any default or a system name
-      paragraf: "Saksomkostning", // Set the rule name for saksomkostning
-      dato: new Date().toISOString().split("T")[0], // today's date
-      beskrivelse: botEntry.paragraf + ", " + botEntry.dato,
-      enheter: 1, // 1 unit for saksomkostning
-    };
-
-    // Make a POST request to add the new bot
-    fetch("http://localhost:8000/boter", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newBot),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then((addedBot) => {
-        // Update the local state with the new bot
-        setData([...data, addedBot]);
-      })
-      .catch((err) => {
-        console.error(`Failed to add new bot for ${person}:`, err);
-        // Handle error appropriately, possibly with user feedback or error logging
-      });
-
-    setSaksomkostningApplied((prevState) => [
-      ...prevState,
-      { id: botId, person: personType },
-    ]);
-  };
-
   return (
     <>
       <div className="container">
