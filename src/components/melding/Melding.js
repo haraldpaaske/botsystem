@@ -44,7 +44,14 @@ const Melding = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const bot = { brutt, melder, paragraf, dato, beskrivelse, enheter };
+    const bot = {
+      brutt,
+      melder,
+      paragraf,
+      dato,
+      beskrivelse,
+      enheter,
+    };
     console.log(bot);
 
     fetch("http://localhost:8000/boter", {

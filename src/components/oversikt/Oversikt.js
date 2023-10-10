@@ -5,11 +5,13 @@ import "../oversikt/oversiktStyles.css";
 const Oversikt = (props) => {
   const players = usePlayers();
   const [data, setData] = useState([]);
+  const [saksData, setSaksData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [rettsak, setRettsak] = useState("notRettsak");
   const [editing, setEditing] = useState(false);
   const [saksomkostningApplied, setSaksomkostningApplied] = useState([]);
+  const [refresh, setRefresh] = useState(0);
 
   const playersWithoutBoter = players.filter(
     (player) => !data.some((bot) => bot.melder === player)
@@ -18,10 +20,12 @@ const Oversikt = (props) => {
   const getSumForPlayer = (player) => {
     let total = data
       .filter((entry) => entry.brutt.includes(player))
-      .reduce((sum, entry) => {
-        console.log(`Adding: ${entry.enheter}, Current total: ${sum}`);
-        return sum + entry.enheter;
-      }, 0);
+      .reduce((sum, entry) => sum + entry.enheter, 0);
+
+    const saksomkostningCount = saksData.filter(
+      (entry) => entry.person === player
+    ).length;
+    total += saksomkostningCount;
 
     if (total < 6) {
       total = 6;
@@ -53,6 +57,25 @@ const Oversikt = (props) => {
       })
       .then((data) => {
         setData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+
+    fetch("http://localhost:8000/saks", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSaksData(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -105,7 +128,22 @@ const Oversikt = (props) => {
       });
   };
 
-  const handleSaksomkostning = (personType, botId) => {
+  const handleSaksomkostning = (name, botId) => {
+    const newSaks = {
+      person: name,
+      bot_id: botId,
+    };
+
+    fetch("http://localhost:8000/saks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newSaks),
+    }).catch((error) => {
+      console.error("Fetch error:", error);
+    });
+  };
+
+  const handleSaksomkostning1 = (personType, botId) => {
     const botEntry = data.find((bot) => bot.id === botId);
     const person =
       personType === "forbryter" ? botEntry.brutt : botEntry.melder;
@@ -150,10 +188,6 @@ const Oversikt = (props) => {
       { id: botId, person: personType },
     ]);
   };
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <>
@@ -203,7 +237,7 @@ const Oversikt = (props) => {
                     (entry) => entry.id === bot.id
                   ) && (
                     <button
-                      onClick={() => handleSaksomkostning("forbryter", bot.id)}
+                      onClick={() => handleSaksomkostning(bot.brutt[0], bot.id)}
                       className={rettsak}
                     >
                       saksomkostning
@@ -222,7 +256,7 @@ const Oversikt = (props) => {
                     (entry) => entry.id === bot.id
                   ) && (
                     <button
-                      onClick={() => handleSaksomkostning("melder", bot.id)}
+                      onClick={() => handleSaksomkostning(bot.melder, bot.id)}
                       className={rettsak}
                     >
                       saksomkostning

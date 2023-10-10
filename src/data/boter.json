@@ -9,6 +9,79 @@
       "enheter": 0,
       "Saksomkostning": "",
       "id": 1
+    },
+    {
+      "brutt": [
+        "Aksel"
+      ],
+      "melder": "Emil",
+      "paragraf": "§ 3 Forfall til trening",
+      "dato": "Mon Oct 09 2023",
+      "beskrivelse": "ghghghg",
+      "enheter": 10,
+      "id": 2,
+      "Saksomkostning": [
+        "Aksel"
+      ]
+    },
+    {
+      "brutt": [
+        "Emil",
+        "Erik Berg"
+      ],
+      "melder": "Haakon",
+      "paragraf": "§ 4 Forfall til kamp",
+      "dato": "Mon Oct 09 2023",
+      "beskrivelse": "hahahahahahah",
+      "enheter": 5,
+      "saksomkostning": "",
+      "id": 3
+    },
+    {
+      "brutt": [
+        "Oscar"
+      ],
+      "melder": "Kasper",
+      "paragraf": "§ 2 Forsinket til kamp",
+      "dato": "Mon Oct 09 2023",
+      "beskrivelse": "asasasas",
+      "enheter": 8,
+      "id": 4,
+      "Saksomkostning": "Kasper",
+      "saksomkostning": "Oscar"
+    },
+    {
+      "id": 1696853827945,
+      "brutt": [
+        "Oscar"
+      ],
+      "melder": "System",
+      "paragraf": "Saksomkostning",
+      "dato": "2023-10-09",
+      "beskrivelse": "§ 2 Forsinket til kamp, Mon Oct 09 2023",
+      "enheter": 1
+    }
+  ],
+  "saks": [
+    {
+      "person": "",
+      "bot_id": 0,
+      "id": 0
+    },
+    {
+      "person": "Oscar",
+      "bot_id": 4,
+      "id": 1
+    },
+    {
+      "person": "Oscar",
+      "bot_id": 4,
+      "id": 2
+    },
+    {
+      "person": "Oscar",
+      "bot_id": 1696853827945,
+      "id": 3
     }
   ],
   "regler": [
