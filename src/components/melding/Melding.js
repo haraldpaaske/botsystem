@@ -54,7 +54,7 @@ const Melding = () => {
     };
     console.log(bot);
 
-    fetch("http://localhost:8000/boter", {
+    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/boter", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(bot),

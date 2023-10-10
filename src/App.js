@@ -26,7 +26,9 @@ function App() {
   const handleLogin = async () => {
     hashPassword();
     try {
-      const response = await fetch("http://localhost:8000/passord/1");
+      const response = await fetch(
+        "https://api.npoint.io/84df09c2d98b53a80fb4/passord/1"
+      );
       const data = await response.json();
       if (bcrypt.compareSync(inputPassword, data.passord1)) {
         setIsLoggedIn(true);
