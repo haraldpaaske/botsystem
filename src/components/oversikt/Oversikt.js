@@ -199,10 +199,10 @@ const Oversikt = (props) => {
               <div className="player-name-status">
                 <span className="bold">{player}</span>
                 {playersWithoutBoter.includes(player) && (
-                  <span className="status status-missed"> Meldt ❌</span>
+                  <span className="status status-missed"> meldt ❌</span>
                 )}
                 {!playersWithoutBoter.includes(player) && (
-                  <span className="status status-done"> Meldt ✅</span>
+                  <span className="status status-done"> meldt ✅</span>
                 )}
               </div>
               <span className="player-units">
