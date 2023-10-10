@@ -102,7 +102,7 @@ const Oversikt = (props) => {
     };
 
     // Make a PUT request to update the server
-    fetch(`http://localhost:8000/boter/${id}`, {
+    fetch(`https://api.npoint.io/84df09c2d98b53a80fb4/boter/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -161,7 +161,7 @@ const Oversikt = (props) => {
     };
 
     // Make a POST request to add the new bot
-    fetch("http://localhost:8000/boter", {
+    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/boter", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

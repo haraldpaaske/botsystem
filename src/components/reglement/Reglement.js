@@ -7,7 +7,7 @@ const Reglement = (props) => {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:8000/regler", {
+    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/regler", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -33,7 +33,7 @@ const Reglement = (props) => {
   };
 
   const updateContent = () => {
-    fetch("http://localhost:8000/regler/0", {
+    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/regler/0", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
