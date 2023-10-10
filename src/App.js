@@ -27,7 +27,7 @@ function App() {
     hashPassword();
     try {
       const response = await fetch(
-        "https://api.npoint.io/84df09c2d98b53a80fb4/passord/1"
+        "https://api.npoint.io/84df09c2d98b53a80fb4/passord/0"
       );
       const data = await response.json();
       if (bcrypt.compareSync(inputPassword, data.passord1)) {
