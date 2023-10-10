@@ -1,6 +1,6 @@
-const apiBaseURL = "http://localhost:8080";
-
 const fetchData = async (url, method = "GET", body) => {
+  const apiBaseURL = "http://localhost:8080";
+
   const response = await fetch(apiBaseURL + url, {
     method,
     headers: { "Content-Type": "application/json" },

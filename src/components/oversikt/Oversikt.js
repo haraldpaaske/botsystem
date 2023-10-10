@@ -45,7 +45,7 @@ const Oversikt = (props) => {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8000/boter", {
+    fetch("https://jsonkeeper.com/b/NB8Z/boter", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -134,7 +134,7 @@ const Oversikt = (props) => {
       bot_id: botId,
     };
 
-    fetch("http://localhost:8000/saks", {
+    fetch("https://jsonkeeper.com/b/NB8Z/saks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newSaks),

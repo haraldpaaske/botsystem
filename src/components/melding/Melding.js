@@ -82,6 +82,7 @@ const Melding = () => {
               onChange={(e) =>
                 setBrutt((prevBrutt) => [...prevBrutt, e.target.value])
               }
+              required
             >
               <option value="" disabled>
                 Select a player
@@ -98,7 +99,11 @@ const Melding = () => {
           <label>
             Hvem er du?
             <br />
-            <select value={melder} onChange={(e) => setMelder(e.target.value)}>
+            <select
+              value={melder}
+              onChange={(e) => setMelder(e.target.value)}
+              required
+            >
               <option value="" disabled>
                 Select a player
               </option>
@@ -116,6 +121,7 @@ const Melding = () => {
             <select
               value={paragraf}
               onChange={(e) => setParagraf(e.target.value)}
+              required
             >
               <option value="" disabled>
                 Select a rule
@@ -137,6 +143,7 @@ const Melding = () => {
               rows="5" // You can adjust the number of rows
               cols="50" // You can adjust the number of columns
               placeholder="Beskriv hendelsen her..."
+              required
             ></textarea>
           </label>
 
@@ -150,6 +157,7 @@ const Melding = () => {
               onChange={(e) => setEnheter(Number(e.target.value))}
               min={1}
               max={30}
+              required
             />
           </label>
           <br />
