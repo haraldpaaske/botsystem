@@ -128,19 +128,31 @@ const Oversikt = (props) => {
       });
   };
 
-  const handleSaksomkostning = (name, botId) => {
+  const handleSaksomkostning = async (name, botId) => {
     const newSaks = {
       person: name,
       bot_id: botId,
     };
 
-    fetch("https://botsystem.onrender.com/saks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newSaks),
-    }).catch((error) => {
+    try {
+      // Await ensures that we wait for the fetch to complete before moving on
+      const response = await fetch("https://botsystem.onrender.com/saks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newSaks),
+      });
+
+      // Check if the response is ok (status 200-299)
+      if (!response.ok) {
+        throw new Error("Network response was not ok" + response.statusText);
+      }
+
+      setSaksomkostningApplied((prevState) => [...prevState, newSaks]);
+
+      setRefresh((prevRefresh) => prevRefresh + 1);
+    } catch (error) {
       console.error("Fetch error:", error);
-    });
+    }
   };
 
   return (
@@ -188,7 +200,7 @@ const Oversikt = (props) => {
                 <td>
                   {Array.isArray(bot.brutt) ? bot.brutt.join(", ") : bot.brutt}
                   {!saksomkostningApplied.some(
-                    (entry) => entry.id === bot.id
+                    (entry) => entry.bot_id === bot.id
                   ) && (
                     <button
                       onClick={() => handleSaksomkostning(bot.brutt[0], bot.id)}
@@ -199,7 +211,7 @@ const Oversikt = (props) => {
                   )}
                   {saksomkostningApplied.some(
                     (entry) =>
-                      entry.id === bot.id && entry.person === "forbryter"
+                      entry.bot_id === bot.id && entry.person === bot.brutt[0]
                   ) && (
                     <span className="saksomkostning-text">saksomkostning</span>
                   )}
@@ -207,7 +219,7 @@ const Oversikt = (props) => {
                 <td className="mobile-hide">
                   {bot.melder}{" "}
                   {!saksomkostningApplied.some(
-                    (entry) => entry.id === bot.id
+                    (entry) => entry.bot_id === bot.id
                   ) && (
                     <button
                       onClick={() => handleSaksomkostning(bot.melder, bot.id)}
@@ -217,7 +229,8 @@ const Oversikt = (props) => {
                     </button>
                   )}
                   {saksomkostningApplied.some(
-                    (entry) => entry.id === bot.id && entry.person === "melder"
+                    (entry) =>
+                      entry.bot_id === bot.id && entry.person === bot.melder
                   ) && (
                     <span className="saksomkostning-text">saksomkostning</span>
                   )}
