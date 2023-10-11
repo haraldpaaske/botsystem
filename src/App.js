@@ -42,7 +42,7 @@ function App() {
 
   return (
     <>
-      <label>
+      <label id="botsjef">
         Botsjefs passord
         <br />
         <input
@@ -52,6 +52,7 @@ function App() {
         />
         <input type="button" value="botsjef" onClick={handleLogin} />
       </label>
+
       <Router>
         <Navbar />
         <Routes>
