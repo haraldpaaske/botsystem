@@ -7,9 +7,11 @@ const Reglement = (props) => {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/regler", {
+    fetch("https://botsystem.onrender.com/regler", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
       .then((response) => {
         if (!response.ok) {
@@ -33,7 +35,7 @@ const Reglement = (props) => {
   };
 
   const updateContent = () => {
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/regler/0", {
+    fetch("https://botsystem.onrender.com/regler/0", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

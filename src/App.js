@@ -19,10 +19,6 @@ function App() {
     setHashedPassword(bcrypt.hashSync(inputPassword, salt));
   };
 
-  useEffect(() => {
-    console.log(hashedPassword);
-  }, [hashedPassword]);
-
   const handleLogin = async () => {
     hashPassword();
     try {
@@ -32,7 +28,6 @@ function App() {
       const data = await response.json();
       if (bcrypt.compareSync(inputPassword, data.passord1)) {
         setIsLoggedIn(true);
-        console.log(isLoggedIn);
       } else {
         alert("Incorrect Password");
       }

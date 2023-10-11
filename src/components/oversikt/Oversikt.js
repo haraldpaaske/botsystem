@@ -45,7 +45,7 @@ const Oversikt = (props) => {
   };
 
   useEffect(() => {
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/boter", {
+    fetch("https://botsystem.onrender.com/boter", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -64,7 +64,7 @@ const Oversikt = (props) => {
         setLoading(false);
       });
 
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/saks", {
+    fetch("https://botsystem.onrender.com/saks", {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     })
@@ -102,7 +102,7 @@ const Oversikt = (props) => {
     };
 
     // Make a PUT request to update the server
-    fetch(`https://api.npoint.io/84df09c2d98b53a80fb4/boter/${id}`, {
+    fetch(`https://botsystem.onrender.com/boter/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -134,59 +134,13 @@ const Oversikt = (props) => {
       bot_id: botId,
     };
 
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/saks", {
+    fetch("https://botsystem.onrender.com/saks", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newSaks),
     }).catch((error) => {
       console.error("Fetch error:", error);
     });
-  };
-
-  const handleSaksomkostning1 = (personType, botId) => {
-    const botEntry = data.find((bot) => bot.id === botId);
-    const person =
-      personType === "forbryter" ? botEntry.brutt : botEntry.melder;
-
-    // Define the new bot to be added
-    const newBot = {
-      // Adjust these properties as necessary
-      id: Date.now(), // a simple unique identifier
-      brutt: person,
-      melder: "System", // Just an example, you can set any default or a system name
-      paragraf: "Saksomkostning", // Set the rule name for saksomkostning
-      dato: new Date().toISOString().split("T")[0], // today's date
-      beskrivelse: botEntry.paragraf + ", " + botEntry.dato,
-      enheter: 1, // 1 unit for saksomkostning
-    };
-
-    // Make a POST request to add the new bot
-    fetch("https://api.npoint.io/84df09c2d98b53a80fb4/boter", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newBot),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then((addedBot) => {
-        // Update the local state with the new bot
-        setData([...data, addedBot]);
-      })
-      .catch((err) => {
-        console.error(`Failed to add new bot for ${person}:`, err);
-        // Handle error appropriately, possibly with user feedback or error logging
-      });
-
-    setSaksomkostningApplied((prevState) => [
-      ...prevState,
-      { id: botId, person: personType },
-    ]);
   };
 
   return (
