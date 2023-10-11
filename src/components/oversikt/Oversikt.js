@@ -33,7 +33,6 @@ const Oversikt = (props) => {
     if (playersWithoutBoter.includes(player)) {
       total += 6;
     }
-
     return total;
   };
 
