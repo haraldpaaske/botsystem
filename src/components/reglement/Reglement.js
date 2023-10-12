@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { db } from "../../firebaseConfig";
+import { ref, onValue, set, off } from "firebase/database";
 import "./regStyles.css";
 
 const Reglement = (props) => {
@@ -7,25 +9,20 @@ const Reglement = (props) => {
   const [content, setContent] = useState("");
 
   useEffect(() => {
-    fetch("https://botsystem.onrender.com/regler", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data && data[0] && data[0].text) {
-          // Ensuring data exists and has the expected structure
-          setContent(data[0].text); // Setting the content to the "text" property of the first object
-        }
-        console.log(data);
-      });
+    const dbRef = ref(db, "regler/0");
+
+    const handleDataChange = (snapshot) => {
+      if (snapshot && snapshot.val() && snapshot.val().text) {
+        setContent(snapshot.val().text);
+      }
+    };
+
+    onValue(dbRef, handleDataChange);
+
+    // Cleanup
+    return () => {
+      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
+    };
   }, []);
 
   const saveContent = () => {
@@ -35,22 +32,9 @@ const Reglement = (props) => {
   };
 
   const updateContent = () => {
-    fetch("https://botsystem.onrender.com/regler/0", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ text: content }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .catch((error) => {
-        console.error("There was an error:", error);
-      });
+    set(ref(db, "regler/0"), { text: content }).catch((error) => {
+      console.error("There was an error:", error);
+    });
   };
 
   return (
@@ -69,7 +53,6 @@ const Reglement = (props) => {
         ) : (
           <div>
             <div dangerouslySetInnerHTML={{ __html: content }} />
-
             {props.botsjef && (
               <button onClick={() => setIsEditing(true)}>Rediger</button>
             )}

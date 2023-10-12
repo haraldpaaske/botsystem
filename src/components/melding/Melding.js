@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import usePlayers from "../../hooks/usePlayers";
 import "./meldStyles.css";
+import { db } from "../../firebaseConfig";
+import { ref, onValue, set, off, push } from "firebase/database";
+
 const Melding = () => {
   const [brutt, setBrutt] = useState([]);
   const [melder, setMelder] = useState("");
@@ -9,6 +12,7 @@ const Melding = () => {
   const [enheter, setEnheter] = useState();
   const dato = new Date().toDateString();
   const players = usePlayers();
+  const [id, setId] = useState([]);
   console.log(players);
   const rules = [
     "§ 1 For Glein til trening",
@@ -42,6 +46,21 @@ const Melding = () => {
     "§ 30 Ekstraordinære hendelser",
   ];
 
+  useEffect(() => {
+    const dbRef = ref(db, "boter");
+
+    const handleDataChange = (snapshot) => {
+      if (snapshot && snapshot.val() && snapshot.val()) {
+        setId(snapshot.val().length);
+      }
+    };
+
+    onValue(dbRef, handleDataChange);
+    return () => {
+      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
+    };
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const bot = {
@@ -51,23 +70,17 @@ const Melding = () => {
       dato,
       beskrivelse,
       enheter,
+      id,
     };
     console.log(bot);
 
-    fetch("https://botsystem.onrender.com/boter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(bot),
-    })
-      .then((response) => {
-        if (response.ok) {
-          window.location.href = "/done";
-        } else {
-          console.error("Failed to submit data");
-        }
+    const botRef = ref(db, `boter/${id}`);
+    set(botRef, bot)
+      .then(() => {
+        window.location.href = "/done";
       })
       .catch((error) => {
-        console.error("Fetch error:", error);
+        console.error("Failed to submit data", error);
       });
   };
   return (
