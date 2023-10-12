@@ -67,7 +67,6 @@ const Oversikt = (props) => {
     console.log(data);
   }, [data]);
 
-  // fetch("https://botsystem.onrender.com/boter", {
   //   method: "GET",
   //   headers: { "Content-Type": "application/json" },
   // })
