@@ -14,9 +14,9 @@ code {
 }
 
 
-@media (max-width: 768px) { /* Adjust breakpoint as necessary */
+@media (max-width: 856px) { /* Adjust breakpoint as necessary */
   body {
-padding: 5px;
+    padding: 5px;
   }
   #botsjef{
     display: none;
