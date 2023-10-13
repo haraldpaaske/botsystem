@@ -2,7 +2,18 @@ import usePlayers from "../../hooks/usePlayers";
 import { useState, useEffect } from "react";
 import "../oversikt/oversiktStyles.css";
 import { db } from "../../firebaseConfig";
-import { ref, onValue, set, off, update } from "firebase/database";
+import {
+  ref,
+  onValue,
+  set,
+  off,
+  update,
+  getDatabase,
+  query,
+  orderByChild,
+  equalTo,
+  get,
+} from "firebase/database";
 
 const Oversikt = (props) => {
   const players = usePlayers();
@@ -50,7 +61,6 @@ const Oversikt = (props) => {
 
     const handleDataChange = (snapshot) => {
       if (snapshot && snapshot.val() && snapshot.val()) {
-        console.log(snapshot.val()); //this dont log
         setData(snapshot.val());
       }
     };
@@ -64,65 +74,19 @@ const Oversikt = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  //   method: "GET",
-  //   headers: { "Content-Type": "application/json" },
-  // })
-  //   .then((response) => {
-  //     if (!response.ok) {
-  //       throw new Error(`Error: ${response.statusText}`);
-  //     }
-  //     return response.json();
-  //   })
-  //   .then((data) => {
-  //     setData(data);
-  //     setLoading(false);
-  //   })
-  //   .catch((err) => {
-  //     setError(err.message);
-  //     setLoading(false);
-  //   });
-
-  // fetch("https://botsystem.onrender.com/saks", {
-  //   method: "GET",
-  //   headers: { "Content-Type": "application/json" },
-  // })
-  //   .then((response) => {
-  //     if (!response.ok) {
-  //       throw new Error(`Error: ${response.statusText}`);
-  //     }
-  //     return response.json();
-  //   })
-  //   .then((data) => {
-  //     setSaksData(data);
-  //     setLoading(false);
-  //   })
-  //   .catch((err) => {
-  //     setError(err.message);
-  //     setLoading(false);
-  //   });
-
-  useEffect(() => {
     const dbRef = ref(db, "saks");
 
     const handleDataChange = (snapshot) => {
-      if (snapshot && snapshot.val()) {
+      if (snapshot && snapshot.val() && snapshot.val()) {
         setSaksData(snapshot.val());
-        setLoading(false);
       }
     };
 
-    const unsubscribe = onValue(dbRef, handleDataChange, (error) => {
-      console.error("Firebase read failed:", error.code);
-      setError(error);
-      setLoading(false);
-    });
+    onValue(dbRef, handleDataChange);
 
     // Cleanup
     return () => {
-      unsubscribe();
+      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
     };
   }, []);
 
@@ -136,66 +100,39 @@ const Oversikt = (props) => {
     }
   };
 
-  // const handleUnitsChange = (id, value) => {
-  //   // Update the bot with the new units
-  //   const updatedBot = {
-  //     ...data.find((bot) => bot.id === id),
-  //     enheter: Number(value),
-  //   };
-
-  //   // Make a PUT request to update the server
-  //   fetch(`https://botsystem.onrender.com/boter/${id}`, {
-  //     method: "PUT",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(updatedBot),
-  //   })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error(`Error: ${response.statusText}`);
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((updatedData) => {
-  //       // Update the local state with the updated data
-  //       const updatedBots = data.map((bot) =>
-  //         bot.id === id ? updatedData : bot
-  //       );
-  //       setData(updatedBots);
-  //     })
-  //     .catch((err) => {
-  //       console.error(`Failed to update bot with id ${id}:`, err);
-  //       // Handle error appropriately, possibly with user feedback or error logging
-  //     });
-  // };
-
   const handleUnitsChange = (id, value) => {
-    // Assuming `data` is an array of objects and each object has a unique id.
-    const botIndex = data.findIndex((bot) => bot.id === id);
-    if (botIndex === -1) return; // exit function if id is not found
+    const db = getDatabase();
+    const botRef = ref(db, "boter");
+    const q = query(botRef, orderByChild("id"), equalTo(id));
+    get(q)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          snapshot.forEach((childSnapshot) => {
+            const botKey = childSnapshot.key;
 
-    // Update the bot with the new units
-    const updatedBot = {
-      ...data[botIndex],
-      enheter: Number(value),
-    };
+            const updatedBot = {
+              ...childSnapshot.val(),
+              enheter: Number(value),
+            };
 
-    // Find the firebase key for the bot
-    const botRef = ref(db, `boter/${id}`);
-
-    // Make a PUT-like request to update Firebase
-    update(botRef, updatedBot)
-      .then(() => {
-        // On success, update local state
-        const updatedBots = data.map((bot) =>
-          bot.id === id ? updatedBot : bot
-        );
-        setData(updatedBots);
+            const specificBotRef = ref(db, `boter/${botKey}`);
+            update(specificBotRef, updatedBot)
+              .then(() => {
+                const updatedBots = data.map((bot) =>
+                  bot.id === id ? updatedBot : bot
+                );
+                setData(updatedBots);
+              })
+              .catch((error) => {
+                console.error(`Failed to update bot with id ${id}:`, error);
+              });
+          });
+        } else {
+          console.log(`No bot found with id ${id}`);
+        }
       })
       .catch((error) => {
-        console.error(`Failed to update bot with id ${id}:`, error);
-        // Handle error appropriately, possibly with user feedback or error logging
+        console.error(`Failed to query bots:`, error);
       });
   };
 
@@ -205,25 +142,14 @@ const Oversikt = (props) => {
       bot_id: botId,
     };
 
-    try {
-      // Await ensures that we wait for the fetch to complete before moving on
-      const response = await fetch("https://botsystem.onrender.com/saks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSaks),
+    const saksRef = ref(db, `saks/${saksData.length}`);
+    set(saksRef, newSaks)
+      .then(() => {
+        setSaksomkostningApplied((prevState) => [...prevState, newSaks]);
+      })
+      .catch((error) => {
+        console.error("Failed to submit data", error);
       });
-
-      // Check if the response is ok (status 200-299)
-      if (!response.ok) {
-        throw new Error("Network response was not ok" + response.statusText);
-      }
-
-      setSaksomkostningApplied((prevState) => [...prevState, newSaks]);
-
-      setRefresh((prevRefresh) => prevRefresh + 1);
-    } catch (error) {
-      console.error("Fetch error:", error);
-    }
   };
 
   if (data.length !== 0) {
