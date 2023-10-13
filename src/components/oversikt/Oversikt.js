@@ -260,9 +260,9 @@ const Oversikt = (props) => {
             <thead>
               <tr>
                 <th> Forbryter</th>
-                <th className="mobile-hide">Innsender</th>
+                <th className="tablet-hide">Innsender</th>
                 <th>Paragraf</th>
-                <th className="mobile-hide">Dato</th>
+                <th className="tablet-hide">Dato</th>
                 <th className="mobile-hide">Beskrivelse</th>
                 <th>Antall enheter</th>
               </tr>
@@ -295,7 +295,7 @@ const Oversikt = (props) => {
                       </span>
                     )}
                   </td>
-                  <td className="mobile-hide">
+                  <td className="tablet-hide">
                     {bot.melder}{" "}
                     {!saksomkostningApplied.some(
                       (entry) => entry.bot_id === bot.id
@@ -317,7 +317,7 @@ const Oversikt = (props) => {
                     )}
                   </td>
                   <td>{bot.paragraf}</td>
-                  <td className="mobile-hide">{bot.dato}</td>
+                  <td className="tablet-hide">{bot.dato}</td>
                   <td className="mobile-hide">{bot.beskrivelse}</td>
                   <td>
                     {editing ? (

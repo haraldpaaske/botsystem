@@ -99,14 +99,23 @@ tr:hover {
 }
 
 @media (max-width: 800px) {
-  .mobile-hide {
-    display: none;
-  }
-
   .table-container{
     position: absolute;
     left: 5px;
     right: 5px;
+  }
+
+}
+
+@media (max-width: 900px) {
+  .tablet-hide {
+    display: none;
+  }
+
+}
+@media (max-width: 650px) {
+  .mobile-hide {
+    display: none;
   }
 
 }
