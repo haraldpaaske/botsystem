@@ -68,7 +68,7 @@ tr:hover {
 .player-name-status {
   display: flex;
   align-items: center;
-  width: 70%;  /* Adjust this as needed */
+  width: 60%;  /* Adjust this as needed */
 }
 
 .bold {
@@ -93,6 +93,10 @@ tr:hover {
   
 }
 
+[id^="registrerteBoter"] {
+  width: 50px;
+  margin-left: 50px;
+}
 
 .notRettsak{
   display: none;

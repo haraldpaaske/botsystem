@@ -85,7 +85,7 @@ const Melding = () => {
   };
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form id="mform" onSubmit={handleSubmit}>
         <div id="formDiv">
           <label>
             Hvem har brutt loven?
@@ -165,6 +165,7 @@ const Melding = () => {
             Antall enheter:
             <br />
             <input
+              id="antall_enheter"
               type="number"
               value={enheter}
               onChange={(e) => setEnheter(Number(e.target.value))}

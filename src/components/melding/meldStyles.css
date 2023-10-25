@@ -1,4 +1,4 @@
-form {
+#mform {
   max-width: 500px;
   margin: 20px auto;
   padding: 30px;
@@ -12,15 +12,15 @@ form {
   margin: auto;
 }
 
-form label {
+#mform label {
   display: block;
   margin-bottom: 20px;
   font-weight: bold;
 }
 
-form select, 
-form input, 
-form textarea {
+#mform select, 
+#mform input, 
+#mform textarea {
   width: 100%;  /* Adjust this value to change the width of the inputs */
   margin-top:5px;
   padding: 10px ;
@@ -29,18 +29,18 @@ form textarea {
   font-size: 16px;
 }
 
-form textarea {
+#mform textarea {
   height: 100px; /* Adjust this value if you want a different initial height for the textarea */
   padding: 10px;
   width: 94%;
 }
 
-input[type="number"]{
+#antall_enheter{
   width: 94%;
 }
 
 
-form button {
+#mform button {
   padding: 10px 20px;
   background-color: #007BFF;
   color: white;
@@ -51,6 +51,6 @@ form button {
   transition: background-color 0.2s;
 }
 
-form button:hover {
+#mform button:hover {
   background-color: #0056b3;
 }

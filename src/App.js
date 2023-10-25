@@ -1,26 +1,18 @@
 import "./App.css";
 import Navbar from "./components/navbar/Navbar";
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Reglement from "./components/reglement/Reglement";
 import Oversikt from "./components/oversikt/Oversikt";
 import Melding from "./components/melding/Melding";
 import Done from "./components/melding/Done";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import bcrypt from "bcryptjs";
 
 function App() {
   const [inputPassword, setInputPassword] = useState("");
-  const [hashedPassword, setHashedPassword] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const hashPassword = () => {
-    // Use bcryptjs to hash and check passwords
-    const salt = bcrypt.genSaltSync(10);
-    setHashedPassword(bcrypt.hashSync(inputPassword, salt));
-  };
-
   const handleLogin = async () => {
-    hashPassword();
     try {
       const response = await fetch(
         "https://api.npoint.io/84df09c2d98b53a80fb4/passord/0"

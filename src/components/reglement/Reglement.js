@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { db } from "../../firebaseConfig";
 import { ref, onValue, set, off } from "firebase/database";
 import "./regStyles.css";
+//dreaft.js
 
 const Reglement = (props) => {
   const [isEditing, setIsEditing] = useState(false);

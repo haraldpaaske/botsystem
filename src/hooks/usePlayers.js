@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 const usePlayers = () => {
   const players = [
     "Aksel",
@@ -16,7 +14,6 @@ const usePlayers = () => {
     "Leon",
     "Lucas",
     "Ludde",
-    "Lucas",
     "Lukáš",
     "Lukas (knugen 2.0)",
     "Maurin",
