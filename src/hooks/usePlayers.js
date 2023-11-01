@@ -19,6 +19,7 @@ const usePlayers = () => {
     "Maurin",
     "Markus",
     "Oscar",
+    "Peter",
     "Theodor",
   ];
   return players;
