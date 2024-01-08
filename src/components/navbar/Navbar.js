@@ -13,6 +13,9 @@ const Navbar = () => {
         <Link to="/reglement">
           <button>botregement</button>
         </Link>
+        <Link to="/arkiv">
+          <button>arkiv</button>
+        </Link>
       </div>
     </>
   );

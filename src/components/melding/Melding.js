@@ -7,6 +7,9 @@ import { ref, onValue, set, off, push } from "firebase/database";
 const Melding = () => {
   const [brutt, setBrutt] = useState([]);
   const [melder, setMelder] = useState("");
+  const [datoBrudd, setDatoBrudd] = useState(
+    Date().toString().split(" ").slice(0, 4).join(" ")
+  );
   const [paragraf, setParagraf] = useState("");
   const [beskrivelse, setBeskrivelse] = useState("");
   const [enheter, setEnheter] = useState();
@@ -66,6 +69,7 @@ const Melding = () => {
     const bot = {
       brutt,
       melder,
+      datoBrudd,
       paragraf,
       dato,
       beskrivelse,
@@ -126,6 +130,16 @@ const Melding = () => {
                 </option>
               ))}
             </select>
+          </label>
+          <br />
+          <label>
+            Når skjedde lovbruddet
+            <br />
+            <input
+              type="date"
+              onChange={(e) => setDatoBrudd(e.target.value)}
+              defaultValue={datoBrudd}
+            ></input>
           </label>
           <br />
           <label>

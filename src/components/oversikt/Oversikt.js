@@ -14,6 +14,7 @@ import {
   equalTo,
   get,
   remove,
+  push,
 } from "firebase/database";
 
 const Oversikt = (props) => {
@@ -356,8 +357,9 @@ const Oversikt = (props) => {
 
     try {
       const boterRef = ref(db, "boter");
-      const boterSnapshot = await get(boterRef);
+      const arkivRef = ref(db, "arkiv");
 
+      const boterSnapshot = await get(boterRef);
       if (boterSnapshot.exists()) {
         const boterData = boterSnapshot.val();
 
@@ -368,6 +370,12 @@ const Oversikt = (props) => {
         const entriesToKeep = Object.keys(boterData)
           .filter((key) => parseInt(key, 10) >= boterCount)
           .map((key) => boterData[key]);
+
+        // Copy entries to arkiv
+        for (const entry of entriesToKeep) {
+          const newArkivEntryRef = push(arkivRef); // Get a new unique reference
+          await set(newArkivEntryRef, entry);
+        }
 
         // Step 2: Delete the boter
         await remove(boterRef);
@@ -380,12 +388,15 @@ const Oversikt = (props) => {
         });
 
         await set(boterRef, newBoterEntries);
-        console.log("Boter restructuring complete.");
+        console.log("Boter restructuring and copy to Arkiv complete.");
       } else {
         console.log("No boter found.");
       }
     } catch (error) {
-      console.error("Error during boter restructuring:", error);
+      console.error(
+        "Error during boter restructuring and copy to Arkiv:",
+        error
+      );
     }
   }
 
@@ -467,7 +478,8 @@ const Oversikt = (props) => {
                 <th> Forbryter</th>
                 <th className="tablet-hide">Innsender</th>
                 <th>Paragraf</th>
-                <th className="tablet-hide">Dato</th>
+                <th>Dato brudd</th>
+                <th className="tablet-hide">Dato meldt</th>
                 <th className="mobile-hide">Beskrivelse</th>
                 <th>Antall enheter</th>
               </tr>
@@ -522,6 +534,7 @@ const Oversikt = (props) => {
                     )}
                   </td>
                   <td>{bot.paragraf}</td>
+                  <td>{bot.datoBrudd}</td>
                   <td className="tablet-hide">{bot.dato}</td>
                   <td className="mobile-hide">{bot.beskrivelse}</td>
                   <td>
@@ -544,6 +557,10 @@ const Oversikt = (props) => {
             </tbody>
           </table>
         </div>
+        <br></br>
+        <button onClick={handleRettsak} style={{ fontSize: "18px" }}>
+          Ferdig med rettsak.
+        </button>
       </>
     );
   } else {

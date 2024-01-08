@@ -7,6 +7,7 @@ import Melding from "./components/melding/Melding";
 import Done from "./components/melding/Done";
 import { useState } from "react";
 import bcrypt from "bcryptjs";
+import Arkiv from "./components/arkiv/Arkiv";
 
 function App() {
   const [inputPassword, setInputPassword] = useState("");
@@ -52,6 +53,7 @@ function App() {
             path="/reglement"
             element={<Reglement botsjef={isLoggedIn} />}
           />
+          <Route path="/arkiv" element={<Arkiv botsjef={isLoggedIn} />} />
           <Route path="/oversikt" element={<Oversikt botsjef={isLoggedIn} />} />
           <Route path="/" element={<Oversikt botsjef={isLoggedIn} />} />
           <Route path="/melding" element={<Melding />} />

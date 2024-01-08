@@ -1,0 +1,60 @@
+/* Filter styles */
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  margin: auto;
+}
+
+
+h1 {
+  text-align: center;
+  margin: 20px;
+}
+
+
+.filter h2 {
+  width: 100%;
+  font-size: 1em;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.filter label {
+  flex: 1 1 48%; /* Two columns with a small gap */
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+}
+
+.filter input, select {
+  height: 30px;
+  background-color: white;
+  width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+/* Adjustments for smaller screens */
+@media screen and (max-width: 600px) {
+  .filter label {
+    flex: 1 1 100%; /* Full width on smaller screens */
+  }
+
+  .filter input {
+    margin-top: 5px; /* Add a small gap between inputs on smaller screens */
+  }
+  
+  .filter {
+    gap: 3px; /* Reduce the gap for smaller screens */
+    padding: 5px; /* Reduce padding for smaller screens */
+  }
+}
