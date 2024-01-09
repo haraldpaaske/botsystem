@@ -173,8 +173,8 @@ const Arkiv = () => {
               <th>Forbryter</th>
               <th className="tablet-hide">Innsender</th>
               <th>Paragraf</th>
-              <th>Dato brudd</th>
-              <th className="tablet-hide">Dato meldt</th>
+              <th>Dato_brudd</th>
+              <th className="tablet-hide">Dato_meldt</th>
               <th className="mobile-hide">Beskrivelse</th>
               <th>Antall</th>
             </tr>
