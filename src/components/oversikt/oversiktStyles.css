@@ -121,6 +121,11 @@ tr:hover {
     font-size: 12px;
   }
 
+
+  td:nth-child(1) {
+    width: 20%; /* Set the first column to 70% of the default size */
+  }
+
   th,
   td {
     max-width: 150px; /* Set a maximum width for individual table cells */
