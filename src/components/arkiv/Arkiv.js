@@ -105,64 +105,66 @@ const Arkiv = () => {
 
   return (
     <>
-      <h1 className="h">Arkivet</h1>
-      <div className="filter">
-        <h2>Filtrer</h2>
-        <label>
-          Forbryter
-          <input
-            type="text"
-            value={filterCriteria.forbryter}
-            onChange={(e) => handleInputChange("forbryter", e.target.value)}
-          />
-        </label>
-        <label>
-          indsender
-          <input
-            type="text"
-            value={filterCriteria.innsender}
-            onChange={(e) => handleInputChange("innsender", e.target.value)}
-          />
-        </label>
-        <label>
-          Paragraf
-          <select
-            value={filterCriteria.paragraf}
-            onChange={(e) => handleInputChange("paragraf", e.target.value)}
-            required
-          >
-            <option value="">alle paragrafer</option>
-            {rules.map((r) => (
-              <option key={r} value={r}>
-                {r}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          dato
-          <input
-            type="text"
-            value={filterCriteria.dato}
-            onChange={(e) => handleInputChange("dato", e.target.value)}
-          />
-        </label>
-        <label>
-          Beskrivelse
-          <input
-            type="text"
-            value={filterCriteria.beskrivelse}
-            onChange={(e) => handleInputChange("beskrivelse", e.target.value)}
-          />
-        </label>
-        <label>
-          antall enheter
-          <input
-            type="number"
-            value={filterCriteria.enheter}
-            onChange={(e) => handleInputChange("enheter", e.target.value)}
-          />
-        </label>
+      <div>
+        <h1 className="h">Arkivet</h1>
+        <div className="filter">
+          <h2>Filtrer</h2>
+          <label>
+            Forbryter
+            <input
+              type="text"
+              value={filterCriteria.forbryter}
+              onChange={(e) => handleInputChange("forbryter", e.target.value)}
+            />
+          </label>
+          <label>
+            indsender
+            <input
+              type="text"
+              value={filterCriteria.innsender}
+              onChange={(e) => handleInputChange("innsender", e.target.value)}
+            />
+          </label>
+          <label>
+            Paragraf
+            <select
+              value={filterCriteria.paragraf}
+              onChange={(e) => handleInputChange("paragraf", e.target.value)}
+              required
+            >
+              <option value="">alle paragrafer</option>
+              {rules.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            dato
+            <input
+              type="text"
+              value={filterCriteria.dato}
+              onChange={(e) => handleInputChange("dato", e.target.value)}
+            />
+          </label>
+          <label>
+            Beskrivelse
+            <input
+              type="text"
+              value={filterCriteria.beskrivelse}
+              onChange={(e) => handleInputChange("beskrivelse", e.target.value)}
+            />
+          </label>
+          <label>
+            antall enheter
+            <input
+              type="number"
+              value={filterCriteria.enheter}
+              onChange={(e) => handleInputChange("enheter", e.target.value)}
+            />
+          </label>
+        </div>
       </div>
       <div className="table-container">
         <table>
