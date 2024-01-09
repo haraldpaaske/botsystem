@@ -6,7 +6,6 @@
   align-items: center;
   background-color: #1b542e;
   padding: 10px;
-
 }
 
 .navbar a {
@@ -24,18 +23,20 @@
 }
 
 .navbar button:hover {
-  background-color: #0E2F1E
+  background-color: #0e2f1e;
 }
 
 /* Add media query for mobile responsiveness */
 @media (max-width: 768px) {
   .navbar {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row; /* Set it back to row for small screens */
+    flex-wrap: wrap; /* Allow wrapping of buttons */
   }
 
   .navbar button {
-    margin-bottom: 10px;
-    width: 100%;
+    margin: 0 5px; /* Add space between buttons */
+    width: auto; /* Let buttons determine their own width */
+    font-size: 10px;
+    padding: 5px 10px;
   }
 }
