@@ -125,6 +125,7 @@ tr:hover {
 
   .table-container {
     overflow-x: auto; /* Enable horizontal scrolling if needed */
+    font-size: 12px;
   }
 
   th,

@@ -34,9 +34,9 @@
   }
 
   .navbar button {
-    margin: 0 5px; /* Add space between buttons */
+    margin: 0 3px; /* Add space between buttons */
     width: auto; /* Let buttons determine their own width */
     font-size: 11px;
-    padding: 5px 10px;
+    padding: 4px 8px;
   }
 }
