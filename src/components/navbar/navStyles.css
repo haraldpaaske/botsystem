@@ -1,5 +1,41 @@
-.navbar{
-  margin: auto;
-  color: red;
-  text-align: center;
+/* navStyles.css */
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #1b542e;
+  padding: 10px;
+
+}
+
+.navbar a {
+  text-decoration: none;
+}
+
+.navbar button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #ffe491;
+  background-color: #a21c20;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.navbar button:hover {
+  background-color: #0E2F1E
+}
+
+/* Add media query for mobile responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .navbar button {
+    margin-bottom: 10px;
+    width: 100%;
+  }
 }
