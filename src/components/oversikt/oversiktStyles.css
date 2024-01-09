@@ -124,6 +124,7 @@ tr:hover {
 @media (max-width: 650px) {
   .mobile-hide {
     display: none;
+    font-size: 11px;
   }
 
 }
