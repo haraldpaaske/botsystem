@@ -49,16 +49,13 @@ max-width: 100vw;
 
 /* Adjustments for smaller screens */
 @media screen and (max-width: 600px) {
-  .filter label {
-    flex: 1 1 100%; /* Full width on smaller screens */
-  }
 
-  .filter input {
-    margin-top: 5px; /* Add a small gap between inputs on smaller screens */
+  .filter{
+    max-width: 80%;
+  }
+  .filter input, select {
+    width: 100%;
   }
   
-  .filter {
-    gap: 3px; /* Reduce the gap for smaller screens */
-    padding: 5px; /* Reduce padding for smaller screens */
-  }
+
 }
