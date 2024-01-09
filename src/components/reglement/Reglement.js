@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { db } from "../../firebaseConfig";
 import { ref, onValue, set, off } from "firebase/database";
 import "./regStyles.css";
-//dreaft.js
 
 const Reglement = (props) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,20 +21,41 @@ const Reglement = (props) => {
 
     // Cleanup
     return () => {
-      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
+      off(dbRef, handleDataChange);
     };
   }, []);
 
-  const saveContent = () => {
-    setContent(contentRef.current.innerHTML);
+  const saveContent = async () => {
+    const newContent = contentRef.current.innerHTML;
     setIsEditing(false);
-    updateContent();
+
+    // Update the content state immediately
+    setContent(newContent);
+
+    // Update the content in the database
+    await updateContent(newContent);
   };
 
-  const updateContent = () => {
-    set(ref(db, "regler/0"), { text: content }).catch((error) => {
-      console.error("There was an error:", error);
-    });
+  const updateContent = async (newContent) => {
+    try {
+      await set(ref(db, "regler/0"), { text: newContent });
+      console.log("Content saved:", newContent);
+    } catch (error) {
+      console.error("Error saving content:", error);
+    }
+  };
+
+  const insertElements = () => {
+    const currentHTML = contentRef.current.innerHTML;
+    const newHTML = `
+      ${currentHTML}
+      <h2>§ New Paragraph</h1>
+      <p>New Paragraph</p>
+      <ul>
+        <li>Bullet Point 1</li>
+      </ul>
+    `;
+    contentRef.current.innerHTML = newHTML;
   };
 
   return (
@@ -47,9 +67,11 @@ const Reglement = (props) => {
               ref={contentRef}
               contentEditable={true}
               dangerouslySetInnerHTML={{ __html: content }}
-              onBlur={saveContent}
             />
-            <button onClick={() => saveContent()}>Save</button>
+            <button onClick={saveContent}>Save</button>
+            {isEditing && (
+              <button onClick={insertElements}>legg til paragraf</button>
+            )}
           </div>
         ) : (
           <div>
