@@ -116,6 +116,23 @@ tr:hover {
     display: none;
   }
 
+  .table-container {
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+    font-size: 12px;
+  }
+
+  th,
+  td {
+    max-width: 150px; /* Set a maximum width for individual table cells */
+
+    overflow: hidden;
+    padding: 5px; /* Add padding for better cell spacing */
+  }
+
+  .navbar button {
+    font-size: 14px; /* Adjust button font size for better visibility on small screens */
+  }
+
 }
 /* Apply styles for screens with a maximum width of 650px */
 @media (max-width: 650px) {
