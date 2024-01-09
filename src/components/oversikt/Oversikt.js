@@ -558,9 +558,11 @@ const Oversikt = (props) => {
           </table>
         </div>
         <br></br>
-        <button onClick={handleRettsak} style={{ fontSize: "18px" }}>
-          Ferdig med rettsak.
-        </button>
+        {props.botsjef && (
+          <button onClick={handleRettsak} style={{ fontSize: "18px" }}>
+            Ferdig med rettsak.
+          </button>
+        )}
       </>
     );
   } else {
