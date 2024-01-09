@@ -363,16 +363,18 @@ const Oversikt = (props) => {
       if (boterSnapshot.exists()) {
         const boterData = boterSnapshot.val();
 
-        // Keep the entry with ID 0
-        const entryZero = boterData[0];
+        // Filter out the boter entries for archiving (0 to boterCount - 1)
+        const entriesToArchive = Object.keys(boterData)
+          .filter((key) => parseInt(key, 10) < boterCount)
+          .map((key) => boterData[key]);
 
-        // Filter out the boter entries that you want to keep
+        // Filter out the boter entries to keep (boterCount and onwards)
         const entriesToKeep = Object.keys(boterData)
           .filter((key) => parseInt(key, 10) >= boterCount)
           .map((key) => boterData[key]);
 
         // Copy entries to arkiv
-        for (const entry of entriesToKeep) {
+        for (const entry of entriesToArchive) {
           const newArkivEntryRef = push(arkivRef); // Get a new unique reference
           await set(newArkivEntryRef, entry);
         }
@@ -381,9 +383,9 @@ const Oversikt = (props) => {
         await remove(boterRef);
 
         // Step 3: Re-add the kept entries with new IDs and ensure ID 0 is preserved
-        const newBoterEntries = { 0: entryZero }; // Initialize with the 0 entry
-        entriesToKeep.forEach((entry, index) => {
-          // We're starting from 1 for the new IDs
+        const newBoterEntries = { 0: entriesToKeep[0] }; // Initialize with the first entry
+        entriesToKeep.slice(1).forEach((entry, index) => {
+          // Start from 1 for the new IDs
           newBoterEntries[index + 1] = entry;
         });
 
