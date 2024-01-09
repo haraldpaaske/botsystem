@@ -151,7 +151,7 @@ tr:hover {
   }
 
   td:nth-child(1) {
-    width: 100%; /* Set the first column to 70% of the default size */
+    width: auto; /* Set the first column to 70% of the default size */
   }
 
   th,
