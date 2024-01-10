@@ -17,7 +17,7 @@
   font-size: 16px;
   color: #ffe491;
   background-color: #a21c20;
-  border: none;
+  border: solid 1px #ffe491;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -36,8 +36,8 @@
 
   .navbar button {
     margin: 5px 2px; /* Adjust the margin for closer spacing */
-    border: solid 0.5px #ffe491;
     width: auto; /* Let buttons determine their own width */
+    border: 0.5px;
     font-size: 11px;
     padding: 3px 6px;
   }
