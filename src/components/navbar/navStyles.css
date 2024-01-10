@@ -31,13 +31,14 @@
   .navbar {
     flex-direction: row; /* Set it back to row for small screens */
     flex-wrap: wrap; /* Allow wrapping of buttons */
-    padding: 10px 2px;
+    padding: 2px;
   }
 
   .navbar button {
-    margin: 0 8px; /* Adjust the margin for closer spacing */
+    margin: 5px 2px; /* Adjust the margin for closer spacing */
+    border: solid 0.5px #ffe491;
     width: auto; /* Let buttons determine their own width */
     font-size: 11px;
-    padding: 4px 8px;
+    padding: 3px 6px;
   }
 }
