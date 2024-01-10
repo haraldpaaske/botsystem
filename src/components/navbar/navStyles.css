@@ -5,7 +5,7 @@
   justify-content: space-around;
   align-items: center;
   background-color: #1b542e;
-  padding: 10px;
+  padding: 12px 20%;
 }
 
 .navbar a {
@@ -34,7 +34,7 @@
   }
 
   .navbar button {
-    margin: 0 3px; /* Add space between buttons */
+    margin: 0 8px; /* Adjust the margin for closer spacing */
     width: auto; /* Let buttons determine their own width */
     font-size: 11px;
     padding: 4px 8px;
