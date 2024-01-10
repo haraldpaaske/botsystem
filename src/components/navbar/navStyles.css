@@ -31,7 +31,7 @@
   .navbar {
     flex-direction: row; /* Set it back to row for small screens */
     flex-wrap: wrap; /* Allow wrapping of buttons */
-    padding: 2px 10px;
+    padding: 10px 2px;
   }
 
   .navbar button {
