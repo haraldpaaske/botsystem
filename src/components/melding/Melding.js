@@ -46,6 +46,7 @@ const Melding = () => {
     "§ 27 Ida/Helle-paragrafen (6)",
     "§ 28 Forakt forettenparagrafen (1)",
     "§ 29 Friendly fire (2-4)",
+    "§ 31 Kjeks Paragrafen (3)",
     "§ 30 Ekstraordinære hendelser (1-30)",
   ];
 
