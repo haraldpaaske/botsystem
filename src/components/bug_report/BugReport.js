@@ -43,8 +43,7 @@ const BugReport = () => {
     <>
       <form onSubmit={handleSubmit}>
         <label>
-          Submit desired feature:
-          <br />
+          <h2>Submit desired feature:</h2>
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
