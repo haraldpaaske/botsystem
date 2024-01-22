@@ -43,12 +43,13 @@ const BugReport = () => {
     <>
       <form onSubmit={handleSubmit}>
         <label>
-          Bug Report:
+          Submit desired feature:
           <br />
-          <input
-            type="text"
+          <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            rows="6" // Adjust the number of rows as needed
+            cols="50" // Adjust the number of columns as needed
             required
           />
         </label>
