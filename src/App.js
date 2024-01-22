@@ -8,6 +8,8 @@ import Done from "./components/melding/Done";
 import { useState } from "react";
 import bcrypt from "bcryptjs";
 import Arkiv from "./components/arkiv/Arkiv";
+import BugReport from "./components/bug_report/BugReport";
+import FeedbackMotatt from "./components/bug_report/FeedbackMottatt";
 
 function App() {
   const [inputPassword, setInputPassword] = useState("");
@@ -58,6 +60,8 @@ function App() {
           <Route path="/" element={<Oversikt botsjef={isLoggedIn} />} />
           <Route path="/melding" element={<Melding />} />
           <Route path="/done" element={<Done />} />
+          <Route path="/motatt" element={<FeedbackMotatt />} />
+          <Route path="/request" element={<BugReport />} />
         </Routes>
       </Router>
     </>
