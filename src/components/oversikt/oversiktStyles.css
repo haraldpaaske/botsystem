@@ -102,6 +102,10 @@ tr:hover {
   display: none;
 }
 
+.faded-row {
+  opacity: 0.5; /* Adjust the opacity as needed */
+}
+
 @media (max-width: 800px) {
   .table-container{
     position: absolute;

@@ -21,6 +21,7 @@ const Oversikt = (props) => {
   const players = usePlayers();
   const [data, setData] = useState([]);
   const [saksData, setSaksData] = useState([]);
+  const [antallBoter, setAntallBoter] = useState(1000);
   const [rettsak, setRettsak] = useState("notRettsak");
   const [editing, setEditing] = useState(false);
   const [saksomkostningApplied, setSaksomkostningApplied] = useState([]);
@@ -36,8 +37,9 @@ const Oversikt = (props) => {
   );
 
   const getSumForPlayer = (player) => {
+    console.log(antallBoter);
     let total = data
-      .filter((entry) => entry.brutt.includes(player))
+      .filter((entry) => entry.brutt.includes(player) && entry.id < antallBoter)
       .reduce((sum, entry) => sum + entry.enheter, 0);
 
     const saksomkostningCount = saksData.filter(
@@ -60,6 +62,23 @@ const Oversikt = (props) => {
       0
     );
   };
+
+  useEffect(() => {
+    const dbRef = ref(db, "antall_boter/0/antall");
+
+    const handleDataChange = (snapshot) => {
+      if (snapshot && snapshot.val() && snapshot.val()) {
+        setAntallBoter(snapshot.val());
+      }
+    };
+
+    onValue(dbRef, handleDataChange);
+
+    // Cleanup
+    return () => {
+      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
+    };
+  }, []);
 
   useEffect(() => {
     const dbRef = ref(db, "boter");
@@ -194,6 +213,15 @@ const Oversikt = (props) => {
         handleDownload();
         handleDownloadFull();
         setRegistreringsMode(false);
+
+        const db = getDatabase();
+        set(ref(db, "antall_boter/0"), { antall: 10000 })
+          .then(() => {
+            console.log("Data written successfully!");
+          })
+          .catch((error) => {
+            console.error("Error writing to Firebase Database", error);
+          });
       }
     } else {
       // User pressed "Cancel"
@@ -488,7 +516,10 @@ const Oversikt = (props) => {
             </thead>
             <tbody>
               {[...(data || [])].reverse().map((bot) => (
-                <tr key={bot.id}>
+                <tr
+                  key={bot.id}
+                  className={bot.id >= antallBoter ? "faded-row" : ""}
+                >
                   <td>
                     {Array.isArray(bot.brutt)
                       ? bot.brutt.join(", ")
