@@ -1,5 +1,5 @@
 import usePlayers from "../../hooks/usePlayers";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "../oversikt/oversiktStyles.css";
 import { db } from "../../firebaseConfig";
 import {
@@ -19,6 +19,7 @@ import {
 
 const Oversikt = (props) => {
   const players = usePlayers();
+  const [sortedPlayers, setSortedPlayers] = useState([]);
   const [data, setData] = useState([]);
   const [saksData, setSaksData] = useState([]);
   const [antallBoter, setAntallBoter] = useState(1000);
@@ -36,25 +37,30 @@ const Oversikt = (props) => {
     (player) => !data.some((bot) => bot.melder === player)
   );
 
-  const getSumForPlayer = (player) => {
-    console.log(antallBoter);
-    let total = data
-      .filter((entry) => entry.brutt.includes(player) && entry.id < antallBoter)
-      .reduce((sum, entry) => sum + entry.enheter, 0);
+  const getSumForPlayer = useCallback(
+    (player) => {
+      console.log(antallBoter);
+      let total = data
+        .filter(
+          (entry) => entry.brutt.includes(player) && entry.id < antallBoter
+        )
+        .reduce((sum, entry) => sum + entry.enheter, 0);
 
-    const saksomkostningCount = saksData.filter(
-      (entry) => entry.person === player
-    ).length;
-    total += saksomkostningCount;
+      const saksomkostningCount = saksData.filter(
+        (entry) => entry.person === player
+      ).length;
+      total += saksomkostningCount;
 
-    if (total < 6) {
-      total = 6;
-    }
-    if (playersWithoutBoter.includes(player)) {
-      total += 6;
-    }
-    return total;
-  };
+      if (total < 6) {
+        total = 6;
+      }
+      if (playersWithoutBoter.includes(player)) {
+        total += 6;
+      }
+      return total;
+    },
+    [antallBoter, data, saksData, playersWithoutBoter]
+  );
 
   const getTotalBoter = () => {
     return players.reduce(
@@ -63,6 +69,29 @@ const Oversikt = (props) => {
     );
   };
 
+  //sort players based on antall enheter
+  useEffect(() => {
+    const calculateAndSetSortedPlayers = () => {
+      const sortedPlayers = players.slice().sort((playerA, playerB) => {
+        const unitsA = getSumForPlayer(playerA);
+        const unitsB = getSumForPlayer(playerB);
+        return unitsB - unitsA; // Sort in descending order based on units
+      });
+
+      setSortedPlayers(sortedPlayers);
+    };
+
+    calculateAndSetSortedPlayers();
+  }, [
+    players,
+    data,
+    antallBoter,
+    saksData,
+    playersWithoutBoter,
+    getSumForPlayer,
+  ]);
+
+  //get antall bøter før rettsak
   useEffect(() => {
     const dbRef = ref(db, "antall_boter/0/antall");
 
@@ -80,6 +109,7 @@ const Oversikt = (props) => {
     };
   }, []);
 
+  //get bøter
   useEffect(() => {
     const dbRef = ref(db, "boter");
     const fullRef = ref(db);
@@ -112,6 +142,7 @@ const Oversikt = (props) => {
     };
   }, []);
 
+  //get saksomkostninger
   useEffect(() => {
     const dbRef = ref(db, "saks");
 
@@ -440,7 +471,7 @@ const Oversikt = (props) => {
         <div className="container">
           <h2>Oversikt</h2>
           <ul>
-            {players.map((player) => (
+            {sortedPlayers.map((player) => (
               <li key={player} className="player-item">
                 <div className="player-name-status">
                   <span className="bold">{player}</span>
