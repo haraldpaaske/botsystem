@@ -47,6 +47,8 @@ const Melding = () => {
     "§ 28 Forakt forettenparagrafen (1)",
     "§ 29 Friendly fire (2-4)",
     "§ 31 Kjeks Paragrafen (3)",
+    "§ 32 Botsjefs-passiv-bot-plikt-paragrafen (1-5)",
+    "§ 33 Movember-paragrafen (3)",
     "§ 30 Ekstraordinære hendelser (1-30)",
   ];
 
