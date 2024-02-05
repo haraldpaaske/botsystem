@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import usePlayers from "../../hooks/usePlayers";
 import "./meldStyles.css";
 import { db } from "../../firebaseConfig";
-import { ref, onValue, set, off, push } from "firebase/database";
+import { ref, onValue, set, off } from "firebase/database";
 
 const Melding = () => {
   const [brutt, setBrutt] = useState([]);
@@ -89,12 +89,6 @@ const Melding = () => {
       .catch((error) => {
         console.error("Failed to submit data", error);
       });
-  };
-
-  const handleSelectPlayer = (selectedPlayer) => {
-    if (!brutt.includes(selectedPlayer)) {
-      setBrutt((prevBrutt) => [...prevBrutt, selectedPlayer]);
-    }
   };
 
   const handleRemoveBrutt = (playerToRemove) => {

@@ -37,6 +37,17 @@ const Oversikt = (props) => {
     (player) => !data.some((bot) => bot.melder === player)
   );
 
+  const handleCheckboxChange = (player) => {
+    setMedbraktRegistertClicked((prevClicked) => ({
+      ...prevClicked,
+      [player]: !prevClicked[player],
+    }));
+  };
+
+  const areAllCheckboxesChecked = () => {
+    return sortedPlayers.every((player) => medbraktRegistrertClicked[player]);
+  };
+
   const getSumForPlayer = useCallback(
     (player) => {
       console.log(antallBoter);
@@ -499,17 +510,15 @@ const Oversikt = (props) => {
                         }
                         disabled={medbraktRegistrertClicked[player]}
                       />
-                      <button
-                        onClick={(e) =>
-                          handleRegistrerBoter(
-                            e.target.previousElementSibling.value,
-                            player
-                          )
-                        }
-                        disabled={medbraktRegistrertClicked[player]}
-                      >
-                        registrer
-                      </button>
+                      <input
+                        type="checkbox"
+                        id={`registrerCheckbox-${player}`}
+                        checked={medbraktRegistrertClicked[player]}
+                        onChange={() => handleCheckboxChange(player)}
+                      />
+                      <label htmlFor={`registrerCheckbox-${player}`}>
+                        motatt
+                      </label>
                     </div>
                   </>
                 )}
@@ -524,7 +533,12 @@ const Oversikt = (props) => {
                 <button onClick={() => setMedbraktRegistertClicked({})}>
                   begyn på nytt
                 </button>
-                <button onClick={confirmNewBotPeriode}>Ferdig</button>
+                <button
+                  onClick={confirmNewBotPeriode}
+                  disabled={!areAllCheckboxesChecked()}
+                >
+                  Ferdig
+                </button>
               </>
             )}
           </div>
