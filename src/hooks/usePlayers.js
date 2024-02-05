@@ -12,7 +12,6 @@ const usePlayers = () => {
     "Kasper",
     "Leon",
     "Lucas",
-    "Ludde",
     "Lukas (knugen 2.0)",
     "Markus",
     "Oscar",
