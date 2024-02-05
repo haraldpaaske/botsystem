@@ -105,13 +105,15 @@ const Melding = () => {
             Hvem har brutt loven?
             <br />
             <select
-              value=""
+              value={brutt}
               onChange={(e) =>
                 setBrutt((prevBrutt) => [...prevBrutt, e.target.value])
               }
               required
             >
-              <option value="">Velg en spiller</option>
+              <option value="" disabled>
+                Velg en spiller
+              </option>
               {players
                 .filter((p) => !brutt.includes(p)) // Filter out selected players
                 .map((p) => (
