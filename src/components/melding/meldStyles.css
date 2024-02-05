@@ -27,6 +27,7 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+  height: 35px;
 }
 
 #mform textarea {
@@ -41,14 +42,26 @@
 
 
 #mform button {
-  padding: 10px 20px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
+  color: #ffe491;
+  background-color: #a21c20;
+
   border-radius: 5px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s;
+}
+
+.remove_button{
+  margin: 10px;
+  padding: 0px;
+  height: 25px;
+  width: 60px;
+  font-size: 13px;
+  border: solid 2px #ffe491;
+}
+
+button[type="submit"] {
+  font-size: 16px;
+  padding: 10px 20px;
+  border: solid 3px #ffe491;
 }
 
 #mform button:hover {

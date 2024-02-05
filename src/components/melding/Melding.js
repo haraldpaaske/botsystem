@@ -90,6 +90,19 @@ const Melding = () => {
         console.error("Failed to submit data", error);
       });
   };
+
+  const handleSelectPlayer = (selectedPlayer) => {
+    if (!brutt.includes(selectedPlayer)) {
+      setBrutt((prevBrutt) => [...prevBrutt, selectedPlayer]);
+    }
+  };
+
+  const handleRemoveBrutt = (playerToRemove) => {
+    setBrutt((prevBrutt) =>
+      prevBrutt.filter((player) => player !== playerToRemove)
+    );
+  };
+
   return (
     <>
       <form id="mform" onSubmit={handleSubmit}>
@@ -98,22 +111,36 @@ const Melding = () => {
             Hvem har brutt loven?
             <br />
             <select
-              value={brutt}
+              value=""
               onChange={(e) =>
                 setBrutt((prevBrutt) => [...prevBrutt, e.target.value])
               }
               required
             >
-              <option value="" disabled>
-                Select a player
-              </option>
-              {players.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
+              <option value="">Velg en spiller</option>
+              {players
+                .filter((p) => !brutt.includes(p)) // Filter out selected players
+                .map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
             </select>
-            <p>{brutt.join(", ")}</p>
+            <br />
+            <br />
+            {brutt.map((selectedPlayer) => (
+              <span key={selectedPlayer}>
+                {selectedPlayer}
+                <button
+                  className="remove_button"
+                  type="button"
+                  onClick={() => handleRemoveBrutt(selectedPlayer)}
+                >
+                  Remove
+                </button>
+                <br />
+              </span>
+            ))}
           </label>
           <br />
           <label>
