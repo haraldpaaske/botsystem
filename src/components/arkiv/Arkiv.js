@@ -67,25 +67,49 @@ const Arkiv = () => {
 
   const filterData = () => {
     const filtered = arkivData.filter((entry) => {
-      return (
-        (entry.brutt
-          .join(", ")
+      const matchesForbryter = entry.brutt
+        .join(", ")
+        .toLowerCase()
+        .includes(filterCriteria.forbryter.toLowerCase());
+
+      const matchesInnsender = entry.melder
+        .toLowerCase()
+        .includes(filterCriteria.innsender.toLowerCase());
+
+      const matchesParagraf =
+        filterCriteria.paragraf === "" ||
+        entry.paragraf === filterCriteria.paragraf;
+
+      const matchesDato =
+        filterCriteria.dato === "" ||
+        entry.datoBrudd
           .toLowerCase()
-          .includes(filterCriteria.forbryter.toLowerCase()) &&
-          entry.melder
-            .toLowerCase()
-            .includes(filterCriteria.innsender.toLowerCase()) &&
-          entry.paragraf
-            .toLowerCase()
-            .includes(filterCriteria.paragraf.toLowerCase()) &&
-          entry.datoBrudd
-            .toLowerCase()
-            .includes(filterCriteria.dato.toLowerCase()) &&
-          entry.beskrivelse
-            .toLowerCase()
-            .includes(filterCriteria.beskrivelse.toLowerCase()) &&
-          filterCriteria.enheter === "") ||
-        entry.enheter.toString() === filterCriteria.enheter
+          .includes(filterCriteria.dato.toLowerCase());
+
+      const matchesBeskrivelse =
+        filterCriteria.beskrivelse === "" ||
+        entry.beskrivelse
+          .toLowerCase()
+          .includes(filterCriteria.beskrivelse.toLowerCase());
+
+      const matchesEnheter =
+        filterCriteria.enheter === "" ||
+        entry.enheter.toString() === filterCriteria.enheter;
+
+      console.log(filterCriteria.beskrivelse);
+      console.log(filterCriteria.dato);
+      console.log(filterCriteria.enheter);
+      console.log(filterCriteria.forbryter);
+      console.log(filterCriteria.innsender);
+      console.log(filterCriteria.paragraf);
+
+      return (
+        matchesForbryter &&
+        matchesInnsender &&
+        matchesParagraf &&
+        matchesDato &&
+        matchesBeskrivelse &&
+        matchesEnheter
       );
     });
 
@@ -182,7 +206,7 @@ const Arkiv = () => {
           <tbody>
             {Array.isArray(filteredData) &&
               filteredData.map((entry) => (
-                <tr key={entry.id}>
+                <tr key={entry.key}>
                   <td>
                     {Array.isArray(entry.brutt)
                       ? entry.brutt.join(", ")
