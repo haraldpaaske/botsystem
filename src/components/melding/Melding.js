@@ -120,22 +120,21 @@ const Melding = () => {
                   </option>
                 ))}
             </select>
-            <br />
-            <br />
-            {brutt.map((selectedPlayer) => (
-              <span key={selectedPlayer}>
-                {selectedPlayer}
-                <button
-                  className="remove_button"
-                  type="button"
-                  onClick={() => handleRemoveBrutt(selectedPlayer)}
-                >
-                  Remove
-                </button>
-                <br />
-              </span>
-            ))}
           </label>
+          {brutt.map((selectedPlayer) => (
+            <span key={selectedPlayer}>
+              {selectedPlayer}
+              <button
+                className="remove_button"
+                type="button"
+                onClick={() => handleRemoveBrutt(selectedPlayer)}
+              >
+                Remove
+              </button>
+              <br />
+            </span>
+          ))}
+
           <br />
           <label>
             Hvem er du?
