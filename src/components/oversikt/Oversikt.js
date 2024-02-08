@@ -27,6 +27,7 @@ const Oversikt = (props) => {
   const [editing, setEditing] = useState(false);
   const [saksomkostningApplied, setSaksomkostningApplied] = useState([]);
   const [registreringsMode, setRegistreringsMode] = useState(false);
+  const [registrerSpillere, setRegistrerSpillere] = useState(false);
   const [medbrakt, setMedbrakt] = useState({});
   const [medbraktRegistrertClicked, setMedbraktRegistertClicked] = useState({});
   const [jsonDataFull, setJsonDataFull] = useState(null);
@@ -50,7 +51,6 @@ const Oversikt = (props) => {
 
   const getSumForPlayer = useCallback(
     (player) => {
-      console.log(antallBoter);
       let total = data
         .filter(
           (entry) => entry.brutt.includes(player) && entry.id < antallBoter
@@ -472,11 +472,26 @@ const Oversikt = (props) => {
     }
   }
 
+  const handleRegSpillere = () => {
+    if (registrerSpillere) {
+      setRegistrerSpillere(false);
+    } else {
+      setRegistrerSpillere(true);
+    }
+  };
+
+  const deletePlayer = () => {
+    console.log("player deleted");
+  };
+
   if (data.length !== 0) {
     return (
       <>
         {props.botsjef && (
-          <button onClick={handleRegMode}>Registrere medbrakte bøter</button>
+          <>
+            <button onClick={handleRegMode}>Registrere medbrakte bøter</button>
+            {/* <button onClick={handleRegSpillere}>fjern/legg til spillere</button> */}
+          </>
         )}
 
         <div className="container">
@@ -486,6 +501,9 @@ const Oversikt = (props) => {
               <li key={player} className="player-item">
                 <div className="player-name-status">
                   <span className="bold">{player}</span>
+                  {registrerSpillere && (
+                    <button onClick={deletePlayer(player)}>fjern</button>
+                  )}
                   {playersWithoutBoter.includes(player) && (
                     <span className="status status-missed"> Meldt ❌</span>
                   )}

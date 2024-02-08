@@ -131,7 +131,7 @@ const Melding = () => {
                 type="button"
                 onClick={() => handleRemoveBrutt(selectedPlayer)}
               >
-                Remove
+                fjern
               </button>
               <br />
             </span>
