@@ -35,6 +35,25 @@ function App() {
     setInputPassword(event.target.value);
   };
 
+  const [meldingFormData, setMeldingFormData] = useState({
+    brutt: [],
+    melder: "",
+    datoBrudd: new Date().toString().split(" ").slice(0, 4).join(" "),
+    paragraf: "",
+    beskrivelse: "",
+    enheter: 0,
+    dato: new Date().toDateString(),
+    id: [],
+  });
+
+  // Function to update form data
+  const updateMeldingFormData = (fieldName, value) => {
+    setMeldingFormData((prevFormData) => ({
+      ...prevFormData,
+      [fieldName]: value,
+    }));
+  };
+
   return (
     <>
       <label id="botsjef">
@@ -58,7 +77,15 @@ function App() {
           <Route path="/arkiv" element={<Arkiv botsjef={isLoggedIn} />} />
           <Route path="/oversikt" element={<Oversikt botsjef={isLoggedIn} />} />
           <Route path="/" element={<Oversikt botsjef={isLoggedIn} />} />
-          <Route path="/melding" element={<Melding />} />
+          <Route
+            path="/melding"
+            element={
+              <Melding
+                formData={meldingFormData}
+                updateFormData={updateMeldingFormData}
+              />
+            }
+          />
           <Route path="/done" element={<Done />} />
           <Route path="/motatt" element={<FeedbackMotatt />} />
           <Route path="/request" element={<BugReport />} />

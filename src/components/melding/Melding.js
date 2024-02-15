@@ -4,18 +4,11 @@ import "./meldStyles.css";
 import { db } from "../../firebaseConfig";
 import { ref, onValue, set, off } from "firebase/database";
 
-const Melding = () => {
-  const [brutt, setBrutt] = useState([]);
-  const [melder, setMelder] = useState("");
-  const [datoBrudd, setDatoBrudd] = useState(
-    Date().toString().split(" ").slice(0, 4).join(" ")
-  );
-  const [paragraf, setParagraf] = useState("");
-  const [beskrivelse, setBeskrivelse] = useState("");
-  const [enheter, setEnheter] = useState();
+const Melding = ({ formData, updateFormData }) => {
+  const { brutt, melder, datoBrudd, paragraf, beskrivelse, enheter, id } =
+    formData;
   const dato = new Date().toDateString();
   const players = usePlayers();
-  const [id, setId] = useState([]);
   console.log(players);
   const rules = [
     "§ 1 For Glein til trening (2)",
@@ -54,10 +47,9 @@ const Melding = () => {
 
   useEffect(() => {
     const dbRef = ref(db, "boter");
-
     const handleDataChange = (snapshot) => {
       if (snapshot && snapshot.val() && snapshot.val()) {
-        setId(snapshot.val().length);
+        updateFormData("id", snapshot.val().length);
       }
     };
 
@@ -65,7 +57,7 @@ const Melding = () => {
     return () => {
       off(dbRef, handleDataChange); // Use the same function reference for cleaning up
     };
-  }, []);
+  }, [updateFormData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -74,12 +66,11 @@ const Melding = () => {
       melder,
       datoBrudd,
       paragraf,
-      dato,
+      dato: new Date().toDateString(),
       beskrivelse,
       enheter,
       id,
     };
-    console.log(bot);
 
     const botRef = ref(db, `boter/${id}`);
     set(botRef, bot)
@@ -92,8 +83,9 @@ const Melding = () => {
   };
 
   const handleRemoveBrutt = (playerToRemove) => {
-    setBrutt((prevBrutt) =>
-      prevBrutt.filter((player) => player !== playerToRemove)
+    updateFormData(
+      "brutt",
+      brutt.filter((player) => player !== playerToRemove)
     );
   };
 
@@ -107,7 +99,7 @@ const Melding = () => {
             <select
               value={brutt}
               onChange={(e) =>
-                setBrutt((prevBrutt) => [...prevBrutt, e.target.value])
+                updateFormData("brutt", [...brutt, e.target.value])
               }
               required
             >
@@ -143,7 +135,7 @@ const Melding = () => {
             <br />
             <select
               value={melder}
-              onChange={(e) => setMelder(e.target.value)}
+              onChange={(e) => updateFormData("melder", e.target.value)}
               required
             >
               <option value="" disabled>
@@ -162,7 +154,7 @@ const Melding = () => {
             <br />
             <input
               type="date"
-              onChange={(e) => setDatoBrudd(e.target.value)}
+              onChange={(e) => updateFormData("datoBrudd", e.target.value)}
               defaultValue={datoBrudd}
             ></input>
           </label>
@@ -172,7 +164,7 @@ const Melding = () => {
             <br />
             <select
               value={paragraf}
-              onChange={(e) => setParagraf(e.target.value)}
+              onChange={(e) => updateFormData("paragraf", e.target.value)}
               required
             >
               <option value="" disabled>
@@ -191,7 +183,7 @@ const Melding = () => {
             <br />
             <textarea
               value={beskrivelse}
-              onChange={(e) => setBeskrivelse(e.target.value)}
+              onChange={(e) => updateFormData("beskrivelse", e.target.value)}
               rows="5" // You can adjust the number of rows
               cols="50" // You can adjust the number of columns
               placeholder="Beskriv hendelsen her..."
@@ -207,7 +199,7 @@ const Melding = () => {
               id="antall_enheter"
               type="number"
               value={enheter}
-              onChange={(e) => setEnheter(Number(e.target.value))}
+              onChange={(e) => updateFormData("enheter", e.target.value)}
               min={1}
               max={30}
               required
