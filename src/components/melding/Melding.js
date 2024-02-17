@@ -199,7 +199,9 @@ const Melding = ({ formData, updateFormData }) => {
               id="antall_enheter"
               type="number"
               value={enheter}
-              onChange={(e) => updateFormData("enheter", e.target.value)}
+              onChange={(e) =>
+                updateFormData("enheter", Number(e.target.value))
+              }
               min={1}
               max={30}
               required

@@ -13,6 +13,7 @@ const usePlayers = () => {
     "Leon",
     "Lucas",
     "Lukas (knugen 2.0)",
+    "Marius",
     "Markus",
     "Oscar",
     "Peter",
