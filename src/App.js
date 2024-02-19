@@ -41,7 +41,7 @@ function App() {
     datoBrudd: new Date().toString().split(" ").slice(0, 4).join(" "),
     paragraf: "",
     beskrivelse: "",
-    enheter: 0,
+    enheter: 1,
     dato: new Date().toDateString(),
     id: [],
   });

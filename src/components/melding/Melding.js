@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import usePlayers from "../../hooks/usePlayers";
 import "./meldStyles.css";
 import { db } from "../../firebaseConfig";
@@ -7,9 +7,11 @@ import { ref, onValue, set, off } from "firebase/database";
 const Melding = ({ formData, updateFormData }) => {
   const { brutt, melder, datoBrudd, paragraf, beskrivelse, enheter, id } =
     formData;
-  const dato = new Date().toDateString();
   const players = usePlayers();
-  console.log(players);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitCooldown, setSubmitCooldown] = useState(false);
+  const submitButtonRef = useRef(null);
+
   const rules = [
     "§ 1 For Glein til trening (2)",
     "§ 2 Forsinket til kamp (3)",
@@ -46,21 +48,41 @@ const Melding = ({ formData, updateFormData }) => {
   ];
 
   useEffect(() => {
+    if (submitCooldown) {
+      // If cooldown is active, disable the button
+      if (submitButtonRef.current) {
+        submitButtonRef.current.disabled = true;
+      }
+      const timer = setTimeout(() => {
+        setSubmitCooldown(false);
+        if (submitButtonRef.current) {
+          submitButtonRef.current.disabled = false;
+        }
+      }, 5000); // Cooldown period of 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [submitCooldown]);
+
+  useEffect(() => {
     const dbRef = ref(db, "boter");
     const handleDataChange = (snapshot) => {
-      if (snapshot && snapshot.val() && snapshot.val()) {
-        updateFormData("id", snapshot.val().length);
+      if (snapshot.exists()) {
+        updateFormData("id", Object.keys(snapshot.val()).length);
       }
     };
 
     onValue(dbRef, handleDataChange);
-    return () => {
-      off(dbRef, handleDataChange); // Use the same function reference for cleaning up
-    };
+    return () => off(dbRef, handleDataChange);
   }, [updateFormData]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting || submitCooldown) return;
+
+    setIsSubmitting(true);
+    setSubmitCooldown(true); // Start cooldown immediately on submit
+
     const bot = {
       brutt,
       melder,
@@ -68,18 +90,23 @@ const Melding = ({ formData, updateFormData }) => {
       paragraf,
       dato: new Date().toDateString(),
       beskrivelse,
-      enheter,
+      enheter: Number(enheter),
       id,
     };
 
-    const botRef = ref(db, `boter/${id}`);
-    set(botRef, bot)
-      .then(() => {
-        window.location.href = "/done";
-      })
-      .catch((error) => {
-        console.error("Failed to submit data", error);
-      });
+    try {
+      await set(ref(db, `boter/${id}`), bot);
+      window.location.href = "/done";
+    } catch (error) {
+      console.error("Failed to submit data", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleNumericInputChange = (e) => {
+    const numericValue = Number(e.target.value);
+    updateFormData("enheter", numericValue);
   };
 
   const handleRemoveBrutt = (playerToRemove) => {
@@ -88,7 +115,6 @@ const Melding = ({ formData, updateFormData }) => {
       brutt.filter((player) => player !== playerToRemove)
     );
   };
-
   return (
     <>
       <form id="mform" onSubmit={handleSubmit}>
@@ -199,16 +225,21 @@ const Melding = ({ formData, updateFormData }) => {
               id="antall_enheter"
               type="number"
               value={enheter}
-              onChange={(e) =>
-                updateFormData("enheter", Number(e.target.value))
-              }
+              onChange={handleNumericInputChange}
               min={1}
               max={30}
               required
             />
           </label>
           <br />
-          <button type="submit">Meld bot</button>
+          <button
+            ref={submitButtonRef}
+            type="submit"
+            disabled={isSubmitting || submitCooldown}
+          >
+            {isSubmitting ? "Sender inn..." : "Meld bot"}
+          </button>
+          {submitCooldown && <p>Sender inn</p>}
         </div>
       </form>
     </>
