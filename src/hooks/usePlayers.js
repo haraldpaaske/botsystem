@@ -6,7 +6,6 @@ const usePlayers = () => {
     "Erik Berg",
     "Haakon",
     "Harald",
-    "Herman",
     "Henrik Gjerde",
     "Henrik Haga",
     "Kasper",
