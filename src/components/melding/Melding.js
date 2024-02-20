@@ -105,8 +105,12 @@ const Melding = ({ formData, updateFormData }) => {
   };
 
   const handleNumericInputChange = (e) => {
-    const numericValue = Number(e.target.value);
-    updateFormData("enheter", numericValue);
+    const value = e.target.value;
+
+    // Update only if the input value is a number or empty (to allow clearing the input)
+    if (value === "" || /^\d+$/.test(value)) {
+      updateFormData("enheter", value === "" ? "" : Number(value));
+    }
   };
 
   const handleRemoveBrutt = (playerToRemove) => {
@@ -225,6 +229,8 @@ const Melding = ({ formData, updateFormData }) => {
               id="antall_enheter"
               type="number"
               value={enheter}
+              inputmode="numeric"
+              pattern="[0-9]*"
               onChange={handleNumericInputChange}
               min={1}
               max={30}
@@ -237,7 +243,7 @@ const Melding = ({ formData, updateFormData }) => {
             type="submit"
             disabled={isSubmitting || submitCooldown}
           >
-            {isSubmitting ? "Sender inn..." : "Meld bot"}
+            {submitCooldown ? "Sender inn..." : "Meld bot"}
           </button>
           {submitCooldown && <p>Sender inn</p>}
         </div>
