@@ -17,6 +17,8 @@ const usePlayers = () => {
     "Oscar",
     "Peter",
     "Theodor",
+    "Dahlarn",
+    "Jonas",
   ];
   return players;
 };
