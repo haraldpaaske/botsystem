@@ -11,6 +11,8 @@ const Melding = ({ formData, updateFormData }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitCooldown, setSubmitCooldown] = useState(false);
   const submitButtonRef = useRef(null);
+  const [gullPaGul, setGullPaGulv] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("");
 
   const rules = [
     "§ 1 For Glein til trening (2)",
@@ -48,6 +50,14 @@ const Melding = ({ formData, updateFormData }) => {
   ];
 
   useEffect(() => {
+    setGullPaGulv(paragraf.includes("Gull på gulv"));
+  }, [paragraf]);
+
+  const handleTimeChange = (e) => {
+    setSelectedTime(e.target.value);
+  };
+
+  useEffect(() => {
     if (submitCooldown) {
       // If cooldown is active, disable the button
       if (submitButtonRef.current) {
@@ -81,7 +91,13 @@ const Melding = ({ formData, updateFormData }) => {
     if (isSubmitting || submitCooldown) return;
 
     setIsSubmitting(true);
-    setSubmitCooldown(true); // Start cooldown immediately on submit
+    setSubmitCooldown(true);
+
+    // Prepend the selectedTime to the description if "Gull på gulv" is selected
+    const finalDescription =
+      gullPaGul && selectedTime
+        ? `${selectedTime} - ${beskrivelse}`
+        : beskrivelse;
 
     const bot = {
       brutt,
@@ -89,7 +105,7 @@ const Melding = ({ formData, updateFormData }) => {
       datoBrudd,
       paragraf,
       dato: new Date().toDateString(),
-      beskrivelse,
+      beskrivelse: finalDescription,
       enheter: Number(enheter),
       id,
     };
@@ -207,6 +223,22 @@ const Melding = ({ formData, updateFormData }) => {
               ))}
             </select>
           </label>
+          <br />
+          {gullPaGul && (
+            <>
+              <label>
+                Tidspunkt for hendelsen:
+                <br />
+                <input
+                  type="time"
+                  value={selectedTime}
+                  onChange={handleTimeChange}
+                  required={gullPaGul} // Make it required only if Gull på gulv is selected
+                />
+              </label>
+            </>
+          )}
+
           <br />
           <label>
             Beskrivelse av situasjonen:
