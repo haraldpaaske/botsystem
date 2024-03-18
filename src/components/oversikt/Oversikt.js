@@ -1,4 +1,5 @@
 import usePlayers from "../../hooks/usePlayers";
+import useRules from "../../hooks/fetchRules";
 import { useState, useEffect, useCallback } from "react";
 import "../oversikt/oversiktStyles.css";
 import { db } from "../../firebaseConfig";
@@ -19,6 +20,7 @@ import {
 
 const Oversikt = (props) => {
   const players = usePlayers();
+  const rules = useRules();
   const [sortedPlayers, setSortedPlayers] = useState([]);
   const [data, setData] = useState([]);
   const [saksData, setSaksData] = useState([]);
@@ -27,12 +29,22 @@ const Oversikt = (props) => {
   const [editing, setEditing] = useState(false);
   const [saksomkostningApplied, setSaksomkostningApplied] = useState([]);
   const [registreringsMode, setRegistreringsMode] = useState(false);
-  const [registrerSpillere, setRegistrerSpillere] = useState(false);
   const [medbrakt, setMedbrakt] = useState({});
   const [medbraktRegistrertClicked, setMedbraktRegistertClicked] = useState({});
   const [jsonDataFull, setJsonDataFull] = useState(null);
   const [jsonDataBoter, setJsonDataBoter] = useState(null);
   const dato = new Date().toDateString().split(" ");
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [filterCriteria, setFilterCriteria] = useState({
+    forbryter: "",
+    innsender: "",
+    paragraf: "",
+    dato: "",
+    beskrivelse: "",
+    enheter: "",
+  });
+  const [filteredData, setFilteredData] = useState([]);
+  const reversedData = [...filteredData].reverse();
 
   const playersWithoutBoter = players.filter(
     (player) => !data.some((bot) => bot.melder === player)
@@ -472,16 +484,63 @@ const Oversikt = (props) => {
     }
   }
 
-  const handleRegSpillere = () => {
-    if (registrerSpillere) {
-      setRegistrerSpillere(false);
-    } else {
-      setRegistrerSpillere(true);
-    }
+  useEffect(() => {
+    filterData();
+  }, [filterCriteria, data]); // Assuming `data` is your original dataset
+
+  const handleInputChange = (field, value) => {
+    setFilterCriteria((prevFilterCriteria) => ({
+      ...prevFilterCriteria,
+      [field]: value,
+    }));
   };
 
-  const deletePlayer = () => {
-    console.log("player deleted");
+  const filterData = () => {
+    const filtered = data.filter((entry) => {
+      const matchesForbryter = Array.isArray(entry.brutt)
+        ? entry.brutt
+            .join(", ")
+            .toLowerCase()
+            .includes(filterCriteria.forbryter.toLowerCase())
+        : entry.brutt
+            .toLowerCase()
+            .includes(filterCriteria.forbryter.toLowerCase());
+
+      const matchesInnsender = entry.melder
+        .toLowerCase()
+        .includes(filterCriteria.innsender.toLowerCase());
+
+      const matchesParagraf =
+        filterCriteria.paragraf === "" ||
+        entry.paragraf === filterCriteria.paragraf;
+
+      const matchesDato =
+        filterCriteria.dato === "" ||
+        entry.datoBrudd
+          .toLowerCase()
+          .includes(filterCriteria.dato.toLowerCase());
+
+      const matchesBeskrivelse =
+        filterCriteria.beskrivelse === "" ||
+        entry.beskrivelse
+          .toLowerCase()
+          .includes(filterCriteria.beskrivelse.toLowerCase());
+
+      const matchesEnheter =
+        filterCriteria.enheter === "" ||
+        entry.enheter.toString() === filterCriteria.enheter;
+
+      return (
+        matchesForbryter &&
+        matchesInnsender &&
+        matchesParagraf &&
+        matchesDato &&
+        matchesBeskrivelse &&
+        matchesEnheter
+      );
+    });
+
+    setFilteredData(filtered);
   };
 
   if (data.length !== 0) {
@@ -501,9 +560,6 @@ const Oversikt = (props) => {
               <li key={player} className="player-item">
                 <div className="player-name-status">
                   <span className="bold">{player}</span>
-                  {registrerSpillere && (
-                    <button onClick={deletePlayer(player)}>fjern</button>
-                  )}
                   {playersWithoutBoter.includes(player) && (
                     <span className="status status-missed"> Meldt ❌</span>
                   )}
@@ -563,6 +619,72 @@ const Oversikt = (props) => {
         </div>
 
         <h2>Alle bøter</h2>
+        <button onClick={() => setIsFilterVisible(!isFilterVisible)}>
+          Toggle Filter
+        </button>
+
+        {isFilterVisible && (
+          <div className="filter">
+            <h2>Filtrer</h2>
+            <label>
+              Forbryter
+              <input
+                type="text"
+                value={filterCriteria.forbryter}
+                onChange={(e) => handleInputChange("forbryter", e.target.value)}
+              />
+            </label>
+            <label>
+              indsender
+              <input
+                type="text"
+                value={filterCriteria.innsender}
+                onChange={(e) => handleInputChange("innsender", e.target.value)}
+              />
+            </label>
+            <label>
+              Paragraf
+              <select
+                value={filterCriteria.paragraf}
+                onChange={(e) => handleInputChange("paragraf", e.target.value)}
+                required
+              >
+                <option value="">alle paragrafer</option>
+                {rules.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              dato
+              <input
+                type="text"
+                value={filterCriteria.dato}
+                onChange={(e) => handleInputChange("dato", e.target.value)}
+              />
+            </label>
+            <label>
+              Beskrivelse
+              <input
+                type="text"
+                value={filterCriteria.beskrivelse}
+                onChange={(e) =>
+                  handleInputChange("beskrivelse", e.target.value)
+                }
+              />
+            </label>
+            <label>
+              antall enheter
+              <input
+                type="number"
+                value={filterCriteria.enheter}
+                onChange={(e) => handleInputChange("enheter", e.target.value)}
+              />
+            </label>
+          </div>
+        )}
         {props.botsjef && <button onClick={handleRettsak}>Rettsak</button>}
         <div className="table-container">
           <table>
@@ -578,7 +700,7 @@ const Oversikt = (props) => {
               </tr>
             </thead>
             <tbody>
-              {[...(data || [])].reverse().map((bot) => (
+            {reversedData.map((bot) => (
                 <tr
                   key={bot.id}
                   className={bot.id >= antallBoter ? "faded-row" : ""}

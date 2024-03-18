@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { db } from "../../firebaseConfig";
 import { ref, onValue, off } from "firebase/database";
 import "./arkivStyles.css";
+import useRules from "../../hooks/fetchRules";
 
 const Arkiv = () => {
   const [arkivData, setArkivData] = useState([]);
@@ -14,37 +15,7 @@ const Arkiv = () => {
     beskrivelse: "",
     enheter: "",
   });
-  const rules = [
-    "§ 1 For Glein til trening",
-    "§ 2 Forsinket til kamp",
-    "§ 3 Forfall til trening",
-    "§ 4 Forfall til kamp",
-    "§ 5 Forfall til klubbens sosiale arrangementer",
-    "§ 6 Utvisning",
-    "§ 7 Oppkast",
-    "§ 8 CV-hor",
-    "§ 9 NAV-paragrafen",
-    "§ 10 Innebandybilde på sosiale medier",
-    "§ 11 Indianer",
-    "§ 12 Desertering",
-    "§ 13 Snurre-paragrafen",
-    "§ 14 Ole Magnus paragrafen",
-    "§ 15 Lohrmann-paragrafen",
-    "§ 16 van der Lee-paragrafen",
-    "§ 17 Dobbel Dusch-paragrafen",
-    "§ 18 Sonic-paragrafen",
-    "§ 19 Cock Block-paragrafen",
-    "§ 20 Tapsparagrafen",
-    "§ 21 Gull på gulv",
-    "§ 22 Stemningsparagrafen",
-    "§ 23 Meldeparagrafen",
-    "§ 24 Fattigparagrafen",
-    "§ 25 Idiot-paragrafen",
-    "§ 27 Ida/Helle-paragrafen",
-    "§ 28 Forakt forettenparagrafen",
-    "§ 29 Friendly fire",
-    "§ 30 Ekstraordinære hendelser",
-  ];
+  const rules = useRules();
 
   useEffect(() => {
     const dbRef = ref(db, "arkiv");
@@ -64,6 +35,10 @@ const Arkiv = () => {
       off(dbRef, handleDataChange);
     };
   }, []);
+
+  useEffect(() => {
+    filterData();
+  }, [filterCriteria, arkivData]);
 
   const filterData = () => {
     const filtered = arkivData.filter((entry) => {
@@ -96,13 +71,6 @@ const Arkiv = () => {
         filterCriteria.enheter === "" ||
         entry.enheter.toString() === filterCriteria.enheter;
 
-      console.log(filterCriteria.beskrivelse);
-      console.log(filterCriteria.dato);
-      console.log(filterCriteria.enheter);
-      console.log(filterCriteria.forbryter);
-      console.log(filterCriteria.innsender);
-      console.log(filterCriteria.paragraf);
-
       return (
         matchesForbryter &&
         matchesInnsender &&
@@ -124,8 +92,18 @@ const Arkiv = () => {
   };
 
   useEffect(() => {
-    filterData();
-  }, [filterCriteria, arkivData]);
+    // Assuming you're fetching and setting arkivData somewhere here
+    // After setting arkivData, we check each entry for debugging purposes
+    arkivData.forEach((entry, index) => {
+      if (!Array.isArray(entry.brutt)) {
+        console.error(
+          `Entry at index ${index} has 'brutt' that is not an array:`,
+          entry
+        );
+        // Optionally, handle or fix the data here
+      }
+    });
+  }, [arkivData]);
 
   return (
     <>
@@ -210,7 +188,7 @@ const Arkiv = () => {
                   <td>
                     {Array.isArray(entry.brutt)
                       ? entry.brutt.join(", ")
-                      : entry.brutt}
+                      : entry.brutt || "N/A"}
                   </td>
                   <td className="tablet-hide">{entry.melder}</td>
                   <td>{entry.paragraf}</td>

@@ -1,0 +1,40 @@
+const useRules = () => {
+  const rules = [
+    "§ 1 For Glein til trening (2)",
+    "§ 2 Forsinket til kamp (3)",
+    "§ 3 Forfall til trening (3)",
+    "§ 4 Forfall til kamp (3-5)",
+    "§ 5 Forfall til klubbens sosiale arrangementer (1-2)",
+    "§ 6 Utvisning (1-3)",
+    "§ 7 Oppkast (2-4)",
+    "§ 8 CV-hor (2)",
+    "§ 9 NAV-paragrafen (2)",
+    "§ 10 Innebandybilde på sosiale medier (1)",
+    "§ 11 Indianer (1-3)",
+    "§ 12 Desertering (3)",
+    "§ 13 Snurre-paragrafen (1)",
+    "§ 14 Ole Magnus paragrafen (2)",
+    "§ 15 Lohrmann-paragrafen (2)",
+    "§ 16 van der Lee-paragrafen (1-2)",
+    "§ 17 Dobbel Dusch-paragrafen (1-6)",
+    "§ 18 Sonic-paragrafen (6)",
+    "§ 19 Cock Block-paragrafen (2)",
+    "§ 20 Tapsparagrafen (1)",
+    "§ 21 Gull på gulv (1-3)",
+    "§ 22 Stemningsparagrafen (1-3)",
+    "§ 23 Meldeparagrafen (6)",
+    "§ 24 Fattigparagrafen (2)",
+    "§ 25 Idiot-paragrafen (2)",
+    "§ 27 Ida/Helle-paragrafen (6)",
+    "§ 28 Forakt forettenparagrafen (1)",
+    "§ 29 Friendly fire (2-4)",
+    "§ 31 Kjeks Paragrafen (3)",
+    "§ 32 Botsjefs-passiv-bot-plikt-paragrafen (1-5)",
+    "§ 33 Movember-paragrafen (3)",
+    "§ 34 Bjørn Magnus-paragrafen (30)",
+    "§ 30 Ekstraordinære hendelser (1-30)",
+  ];
+  return rules;
+};
+
+export default useRules;
