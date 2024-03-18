@@ -619,7 +619,23 @@ const Oversikt = (props) => {
         </div>
 
         <h2>Alle bøter</h2>
-        <button onClick={() => setIsFilterVisible(!isFilterVisible)}>
+        <button
+          onClick={() => {
+            setIsFilterVisible((prev) => {
+              if (prev) {
+                setFilterCriteria({
+                  forbryter: "",
+                  innsender: "",
+                  paragraf: "",
+                  dato: "",
+                  beskrivelse: "",
+                  enheter: "",
+                });
+              }
+              return !prev;
+            });
+          }}
+        >
           Toggle Filter
         </button>
 
@@ -700,7 +716,7 @@ const Oversikt = (props) => {
               </tr>
             </thead>
             <tbody>
-            {reversedData.map((bot) => (
+              {reversedData.map((bot) => (
                 <tr
                   key={bot.id}
                   className={bot.id >= antallBoter ? "faded-row" : ""}
