@@ -1,6 +1,6 @@
 import usePlayers from "../../hooks/usePlayers";
 import useRules from "../../hooks/fetchRules";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import "../oversikt/oversiktStyles.css";
 import { db } from "../../firebaseConfig";
 import {
@@ -46,8 +46,10 @@ const Oversikt = (props) => {
   const [filteredData, setFilteredData] = useState([]);
   const reversedData = [...filteredData].reverse();
 
-  const playersWithoutBoter = players.filter(
-    (player) => !data.some((bot) => bot.melder === player)
+  const playersWithoutBoter = useMemo(
+    () =>
+      players.filter((player) => !data.some((bot) => bot.melder === player)),
+    [players, data]
   );
 
   const handleCheckboxChange = (player) => {
@@ -105,14 +107,7 @@ const Oversikt = (props) => {
     };
 
     calculateAndSetSortedPlayers();
-  }, [
-    players,
-    data,
-    antallBoter,
-    saksData,
-    playersWithoutBoter,
-    getSumForPlayer,
-  ]);
+  }, [players, data, antallBoter, saksData, getSumForPlayer]);
 
   //get antall bøter før rettsak
   useEffect(() => {
@@ -267,6 +262,27 @@ const Oversikt = (props) => {
         handleDownload();
         handleDownloadFull();
         setRegistreringsMode(false);
+
+        // New functionality to delete "saksomkostninger"
+        const saksRef = ref(db, "saks");
+        get(saksRef)
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              const saksData = snapshot.val();
+              Object.keys(saksData).forEach((key) => {
+                if (key !== "0") {
+                  // Skip the entry with key '0'
+                  const saksToDeleteRef = ref(db, `saks/${key}`);
+                  remove(saksToDeleteRef).catch((error) => {
+                    console.error("Failed to delete saksomkostning", error);
+                  });
+                }
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching saksomkostninger", error);
+          });
 
         const db = getDatabase();
         set(ref(db, "antall_boter/0"), { antall: 10000 })
@@ -485,6 +501,54 @@ const Oversikt = (props) => {
   }
 
   useEffect(() => {
+    const filterData = () => {
+      const filtered = data.filter((entry) => {
+        const matchesForbryter = Array.isArray(entry.brutt)
+          ? entry.brutt
+              .join(", ")
+              .toLowerCase()
+              .includes(filterCriteria.forbryter.toLowerCase())
+          : entry.brutt
+              .toLowerCase()
+              .includes(filterCriteria.forbryter.toLowerCase());
+
+        const matchesInnsender = entry.melder
+          .toLowerCase()
+          .includes(filterCriteria.innsender.toLowerCase());
+
+        const matchesParagraf =
+          filterCriteria.paragraf === "" ||
+          entry.paragraf === filterCriteria.paragraf;
+
+        const matchesDato =
+          filterCriteria.dato === "" ||
+          entry.datoBrudd
+            .toLowerCase()
+            .includes(filterCriteria.dato.toLowerCase());
+
+        const matchesBeskrivelse =
+          filterCriteria.beskrivelse === "" ||
+          entry.beskrivelse
+            .toLowerCase()
+            .includes(filterCriteria.beskrivelse.toLowerCase());
+
+        const matchesEnheter =
+          filterCriteria.enheter === "" ||
+          entry.enheter.toString() === filterCriteria.enheter;
+
+        return (
+          matchesForbryter &&
+          matchesInnsender &&
+          matchesParagraf &&
+          matchesDato &&
+          matchesBeskrivelse &&
+          matchesEnheter
+        );
+      });
+
+      setFilteredData(filtered);
+    };
+
     filterData();
   }, [filterCriteria, data]); // Assuming `data` is your original dataset
 
@@ -493,54 +557,6 @@ const Oversikt = (props) => {
       ...prevFilterCriteria,
       [field]: value,
     }));
-  };
-
-  const filterData = () => {
-    const filtered = data.filter((entry) => {
-      const matchesForbryter = Array.isArray(entry.brutt)
-        ? entry.brutt
-            .join(", ")
-            .toLowerCase()
-            .includes(filterCriteria.forbryter.toLowerCase())
-        : entry.brutt
-            .toLowerCase()
-            .includes(filterCriteria.forbryter.toLowerCase());
-
-      const matchesInnsender = entry.melder
-        .toLowerCase()
-        .includes(filterCriteria.innsender.toLowerCase());
-
-      const matchesParagraf =
-        filterCriteria.paragraf === "" ||
-        entry.paragraf === filterCriteria.paragraf;
-
-      const matchesDato =
-        filterCriteria.dato === "" ||
-        entry.datoBrudd
-          .toLowerCase()
-          .includes(filterCriteria.dato.toLowerCase());
-
-      const matchesBeskrivelse =
-        filterCriteria.beskrivelse === "" ||
-        entry.beskrivelse
-          .toLowerCase()
-          .includes(filterCriteria.beskrivelse.toLowerCase());
-
-      const matchesEnheter =
-        filterCriteria.enheter === "" ||
-        entry.enheter.toString() === filterCriteria.enheter;
-
-      return (
-        matchesForbryter &&
-        matchesInnsender &&
-        matchesParagraf &&
-        matchesDato &&
-        matchesBeskrivelse &&
-        matchesEnheter
-      );
-    });
-
-    setFilteredData(filtered);
   };
 
   if (data.length !== 0) {
