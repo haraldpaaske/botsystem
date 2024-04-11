@@ -123,7 +123,7 @@
               <select
                 value={selectedBrutt}
                 onChange={handleBruttSelectChange}
-                required
+                required={brutt.length === 0}
               >
                 <option value="" disabled>
                   Velg spiller
