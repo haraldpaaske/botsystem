@@ -51,9 +51,9 @@ const Arkiv = () => {
         .toLowerCase()
         .includes(filterCriteria.innsender.toLowerCase());
 
-      const matchesParagraf =
-        filterCriteria.paragraf === "" ||
-        entry.paragraf === filterCriteria.paragraf;
+      const matchesParagraf = entry.paragraf
+        .toLowerCase()
+        .includes(filterCriteria.paragraf.toLowerCase());
 
       const matchesDato =
         filterCriteria.dato === "" ||
@@ -129,18 +129,11 @@ const Arkiv = () => {
           </label>
           <label>
             Paragraf
-            <select
+            <input
+              type="text"
               value={filterCriteria.paragraf}
               onChange={(e) => handleInputChange("paragraf", e.target.value)}
-              required
-            >
-              <option value="">alle paragrafer</option>
-              {rules.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            />
           </label>
           <label>
             dato
