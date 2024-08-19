@@ -17,6 +17,7 @@ import {
   remove,
   push,
 } from "firebase/database";
+import RedigerSpillere from "./RedigerSpillere";
 
 const Oversikt = (props) => {
   const players = usePlayers();
@@ -633,6 +634,12 @@ const Oversikt = (props) => {
             )}
           </div>
         </div>
+        {props.botsjef && (
+          <>
+            <RedigerSpillere />
+          </>
+        )}
+        
 
         <h2>Alle bøter</h2>
         <button
