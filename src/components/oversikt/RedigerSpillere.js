@@ -64,7 +64,7 @@ const RedigerSpillere = () => {
       <div>
         <input 
           type="text" 
-          placeholder="Navn på pansjonert spiller" 
+          placeholder="Navn på pensjonert spiller" 
           value={playerNameToRemove} 
           onChange={(e) => setPlayerNameToRemove(e.target.value)} 
         />
