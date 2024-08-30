@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { db } from "../../firebaseConfig";
 import { ref, set, remove, push, onValue } from 'firebase/database';
 
@@ -19,6 +19,7 @@ const RedigerSpillere = () => {
         })
         .catch((error) => {
           console.error('Error adding player: ', error);
+          alert('Error adding player: ', error)
         });
     }
   };
@@ -40,9 +41,11 @@ const RedigerSpillere = () => {
             })
             .catch((error) => {
               console.error('Error removing player: ', error);
+              alert('Error removing player: ', error)
             });
         } else {
           console.error('Player not found in the roster');
+          alert('Player not found in the roster')
         }
       }, {
         onlyOnce: true // Ensures the listener is not persistent
