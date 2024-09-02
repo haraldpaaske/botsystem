@@ -366,18 +366,21 @@ const Oversikt = (props) => {
 
     // After all new bots are added, proceed with archiving
     await restructureBoter();
-  
-    // Add all new bots to the database in one go
-    for (const bot of newBots) {
-      const botRef = ref(db, `boter/${bot.id}`);
-      try {
-        await set(botRef, bot);
-      } catch (error) {
-        console.error("Failed to submit data", error);
-      }
-    }
 
-  };
+    // Batch add all new bots to the database in one go
+    const updates = {};
+    newBots.forEach(bot => {
+      updates[`boter/${bot.id}`] = bot;
+    });
+
+    try {
+      await update(ref(db), updates);
+      console.log("All bots added successfully!");
+    } catch (error) {
+      console.error("Failed to update data", error);
+    }
+};
+
   
 
   const handleMedbraktChange = (playerName, newValue) => {
