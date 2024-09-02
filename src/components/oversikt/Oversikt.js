@@ -66,17 +66,28 @@ const Oversikt = (props) => {
 
   const getSumForPlayer = useCallback(
     (player) => {
-      let total = data
-        .filter(
-          (entry) => entry.brutt.includes(player) && entry.id < antallBoter
-        )
-        .reduce((sum, entry) => sum + entry.enheter, 0);
-
+      let total = 0;
+  
+      try {
+        total = data
+          .filter((entry) => {
+            // Check if `entry.brutt` is valid and can use `includes`
+            if (!entry.brutt || typeof entry.brutt.includes !== 'function') {
+              console.log('Problematic entry:', entry);
+              return false;
+            }
+            return entry.brutt.includes(player) && entry.id < antallBoter;
+          })
+          .reduce((sum, entry) => sum + entry.enheter, 0);
+      } catch (error) {
+        console.error('Error during filtering or reducing data:', error);
+      }
+  
       const saksomkostningCount = saksData.filter(
         (entry) => entry.person === player
       ).length;
       total += saksomkostningCount;
-
+  
       if (total < 6) {
         total = 6;
       }
@@ -251,6 +262,8 @@ const Oversikt = (props) => {
   };
 
   function confirmNewBotPeriode() {
+    const db = getDatabase();
+    
     var userConfirmation = window.confirm(
       "Vil du fortsette inn i ny bot-periode? dette vil slette alle gamle bøter og legge til de nye som ble meldt inn etter rettsak. De gamle blir lasted ned for sikkhetskyld."
     );
@@ -260,8 +273,7 @@ const Oversikt = (props) => {
       if (window.confirm("Bekreft: Begynne ny bot-periode")) {
         alert("Ny bot periode er i gang!");
         ferdigRegistertMedbrakte();
-        handleDownload();
-        handleDownloadFull();
+
         setRegistreringsMode(false);
 
         // New functionality to delete "saksomkostninger"
@@ -285,7 +297,6 @@ const Oversikt = (props) => {
             console.error("Error fetching saksomkostninger", error);
           });
 
-        const db = getDatabase();
         set(ref(db, "antall_boter/0"), { antall: 10000 })
           .then(() => {
             console.log("Data written successfully!");
@@ -300,12 +311,14 @@ const Oversikt = (props) => {
     }
   }
 
-  const ferdigRegistertMedbrakte = () => {
+  const ferdigRegistertMedbrakte = async () => {
+    const db = getDatabase();
+    let newBots = []; // Array to hold new bots to be added
+  
     for (let player of players) {
-      //får ida pluss hellehvis: man har tatt med mindre ann man skal, trenger maks ta med 30
+      // Calculate the Ida/Helle bots and other necessary bots
       if (getSumForPlayer(player) > medbrakt[player] && medbrakt[player] < 30) {
-        //regirstrer en ida+helle pluss en bøter fra tidligere bot
-        let brutt = player;
+        let brutt = [player];
         let melder = "Systemet";
         let paragraf = "§ 27 Ida/Helle-paragrafen";
         let dato = new Date().toDateString();
@@ -313,7 +326,7 @@ const Oversikt = (props) => {
           getSumForPlayer(player) - medbrakt[player]
         } enhet(er) fra tidligere botfest`;
         let enheter = getSumForPlayer(player) - medbrakt[player] + 6;
-        let id = data.length;
+        let id = Math.max(newBots.length+1, data.length - antallBoter + newBots.length + 1);
         const idahelle = {
           brutt,
           melder,
@@ -323,18 +336,12 @@ const Oversikt = (props) => {
           enheter,
           id,
         };
-        console.log(idahelle);
-
-        const botRef = ref(db, `boter/${id}`);
-        set(botRef, idahelle).catch((error) => {
-          console.error("Failed to submit data", error);
-        });
+        newBots.push(idahelle); // Add to the new bots array
       } else if (
         medbrakt[player] >= 30 &&
         getSumForPlayer(player) > 30 &&
         medbrakt[player] <= getSumForPlayer(player)
       ) {
-        //regirtrer en "bot fra tidlige bot"
         let brutt = player;
         let melder = "Systemet";
         let paragraf = "Enheter fra tidligere botfest";
@@ -343,7 +350,7 @@ const Oversikt = (props) => {
           getSumForPlayer(player) - medbrakt[player]
         }`;
         let enheter = getSumForPlayer(player) - medbrakt[player];
-        let id = data.length;
+        let id = Math.max(newBots.length + 1, data.length - antallBoter + newBots.length + 1); // Updated ID calculation
         const restebot = {
           brutt,
           melder,
@@ -353,15 +360,25 @@ const Oversikt = (props) => {
           enheter,
           id,
         };
-        console.log(restebot);
-
-        const botRef = ref(db, `boter/${id}`);
-        set(botRef, restebot).catch((error) => {
-          console.error("Failed to submit data", error);
-        });
+        newBots.push(restebot); // Add to the new bots array
       }
     }
+
+    // After all new bots are added, proceed with archiving
+    await restructureBoter();
+  
+    // Add all new bots to the database in one go
+    for (const bot of newBots) {
+      const botRef = ref(db, `boter/${bot.id}`);
+      try {
+        await set(botRef, bot);
+      } catch (error) {
+        console.error("Failed to submit data", error);
+      }
+    }
+
   };
+  
 
   const handleMedbraktChange = (playerName, newValue) => {
     const updatedMedbrakt = {
@@ -438,7 +455,7 @@ const Oversikt = (props) => {
   async function restructureBoter() {
     const db = getDatabase();
     let boterCount;
-
+  
     // Step 1: Get the 'antall_boter' value
     try {
       const snapshot = await get(ref(db, "antall_boter/0/antall"));
@@ -453,42 +470,67 @@ const Oversikt = (props) => {
       console.error("Error fetching antall_boter:", error);
       return;
     }
-
+  
     try {
       const boterRef = ref(db, "boter");
       const arkivRef = ref(db, "arkiv");
-
+  
       const boterSnapshot = await get(boterRef);
       if (boterSnapshot.exists()) {
         const boterData = boterSnapshot.val();
-
+  
         // Filter out the boter entries for archiving (0 to boterCount - 1)
         const entriesToArchive = Object.keys(boterData)
-          .filter((key) => parseInt(key, 10) < boterCount)
+          .filter((key) => parseInt(key, 10) < boterCount && parseInt(key, 10) > 0)
           .map((key) => boterData[key]);
-
+  
         // Filter out the boter entries to keep (boterCount and onwards)
         const entriesToKeep = Object.keys(boterData)
-          .filter((key) => parseInt(key, 10) >= boterCount)
+          .filter((key) => parseInt(key, 10) >= boterCount || parseInt(key, 10) === 0)
           .map((key) => boterData[key]);
-
+  
         // Copy entries to arkiv
         for (const entry of entriesToArchive) {
           const newArkivEntryRef = push(arkivRef); // Get a new unique reference
           await set(newArkivEntryRef, entry);
         }
-
+  
         // Step 2: Delete the boter
         await remove(boterRef);
-
+  
         // Step 3: Re-add the kept entries with new IDs and ensure ID 0 is preserved
-        const newBoterEntries = { 0: entriesToKeep[0] }; // Initialize with the first entry
-        entriesToKeep.slice(1).forEach((entry, index) => {
-          // Start from 1 for the new IDs
-          newBoterEntries[index + 1] = entry;
-        });
+        if (entriesToKeep.length > 0) {
+          const newBoterEntries = { 0: entriesToKeep[0] }; // Initialize with the first entry
+          entriesToKeep.slice(1).forEach((entry, index) => {
+            // Start from 1 for the new IDs
+            newBoterEntries[index + 1] = entry;
+          });
+  
+          await set(boterRef, newBoterEntries);
 
-        await set(boterRef, newBoterEntries);
+        } else {
+
+          let id= 0
+          const placeholderbot = {
+            brutt: [""],
+            melder: "",
+            datoBrudd: "",
+            paragraf: "",
+            dato: "",
+            beskrivelse: "",
+            enheter: 0,
+            id,
+          };
+    
+          try {
+            await set(ref(db, `boter/${id}`), placeholderbot);
+          } catch (error) {
+            console.error("Failed to place placeholder bot", error);
+          } 
+
+          console.log("No entries to keep.");
+        }
+  
         console.log("Boter restructuring and copy to Arkiv complete.");
       } else {
         console.log("No boter found.");
@@ -500,6 +542,7 @@ const Oversikt = (props) => {
       );
     }
   }
+  
 
   useEffect(() => {
     const filterData = () => {
