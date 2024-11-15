@@ -87,9 +87,15 @@ const Reglement = (props) => {
 
   return (
     <>
+    {isEditing ? (
+      <button onClick={saveContent}>Save</button>
+    ):(
+      <>
       {props.botsjef && (
         <button onClick={() => setIsEditing(true)}>Rediger</button>
       )}
+      </>
+    )}
       <div className="reglement">
         {isEditing ? (
           <div>
