@@ -11,7 +11,7 @@ const Navbar = () => {
           <button>melding av bøter</button>
         </Link>
         <Link to="/reglement">
-          <button>botregement</button>
+          <button>botreglement</button>
         </Link>
         <Link to="/arkiv">
           <button>arkiv</button>
