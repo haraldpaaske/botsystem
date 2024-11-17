@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { db } from "../../firebaseConfig";
-import { ref, onValue, set, off, push } from "firebase/database";
+import { ref, onValue, set, off, push, get, remove } from "firebase/database";
 import "./regStyles.css";
 
 const Reglement = (props) => {
@@ -85,6 +85,55 @@ const Reglement = (props) => {
     }
   };
 
+  const deleteRule = async () => {
+    try {
+      if (newRule.trim() === '') {
+        alert('Skriv inn navnet på paragrafen du vil slette.');
+        return;
+      }
+  
+      // Reference to the 'regler/1' path
+      const rulesRef = ref(db, '/regler/1');
+  
+      // Fetch all rules
+      const snapshot = await get(rulesRef);
+      if (!snapshot.exists()) {
+        alert('Ingen paragrafer funnet i systemet.');
+        return;
+      }
+  
+      const rules = snapshot.val();
+      const userInput = newRule.trim(); // Get the user's input
+  
+      // Find the matching rule key
+      const ruleKey = Object.keys(rules).find(key => {
+        const ruleName = rules[key];
+    
+        // Match the full rule (with parentheses) or just the main part (without parentheses)
+        // Remove any trailing parentheses from the rule name for comparison purposes
+        const cleanedRuleName = ruleName.replace(/\s*\(.*\)$/, '').trim(); // Remove anything after the parentheses
+        
+        // Match either the full rule or just the main identifier part
+        return ruleName === userInput || cleanedRuleName === userInput;
+      });
+  
+      if (ruleKey) {
+        const confirmDelete = window.confirm(`Er du sikker på at du vil slette paragraf "${rules[ruleKey]}"?`);
+        if (confirmDelete) {
+          // Delete the rule
+          await remove(ref(db, `/regler/1/${ruleKey}`));
+          alert(`Paragraf "${rules[ruleKey]}" er slettet.`);
+          setNewRule(''); // Clear the input field
+        }
+      } else {
+        alert(`Paragraf "${newRule}" eksisterer ikke.`);
+      }
+    } catch (error) {
+      console.error('Error deleting rule: ', error);
+      alert('Error deleting rule: ', error.message);
+    }
+  };
+
   return (
     <>
     {isEditing ? (
@@ -107,14 +156,16 @@ const Reglement = (props) => {
             <button onClick={saveContent}>Save</button><br/><br/>
             {isEditing && (
               <>
-                <button onClick={insertElements}>legg til paragraf</button><br/><br/>
-                <button onClick={saveNewRule}>legg til paragraf i systemet</button><br/>
+                <button onClick={insertElements}>Legg til paragraf</button><br/><br/>
+                
                 <input
-                  id="newRule"
+                  id="newRule"  
                   placeholder="§ 3 Forfall til trening (1-3)"
                   value={newRule} // Bind the input value to the state
                   onChange={(e) => setNewRule(e.target.value)} // Update the state on input change
                 /><br/>
+                <button onClick={saveNewRule}>Legg til paragraf i systemet</button>
+                <button onClick={deleteRule}>Slett paragraf</button><br/>
                 
               </>
             )}
