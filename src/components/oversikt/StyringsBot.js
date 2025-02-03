@@ -5,14 +5,14 @@ import "../melding/meldStyles.css";
 import { db } from "../../firebaseConfig";
 import { ref, onValue, set, off } from "firebase/database";
 
-const StyringsBot = () => {
+const StyringsBot = ({ onClose }) => {
+  // Accept onClose as a prop
   const players = usePlayers() || []; // Ensure it's always an array
   const rules = useRules() || [];
 
-  // Local state for form fields
   const [brutt, setBrutt] = useState([]);
   const [beskrivelse, setBeskrivelse] = useState("");
-  const [enheter, setEnheter] = useState(1);
+  const [enheter, setEnheter] = useState(-1);
   const [id, setId] = useState(0);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,14 +31,13 @@ const StyringsBot = () => {
     }
   }, [submitCooldown]);
 
-  // Fetch the next available ID from the database
   useEffect(() => {
     const dbRef = ref(db, "boter");
     const handleDataChange = (snapshot) => {
       if (snapshot.exists() && snapshot.val()) {
         setId(Object.keys(snapshot.val()).length);
       } else {
-        setId(0); // Prevent undefined issues
+        setId(0);
       }
     };
     onValue(dbRef, handleDataChange);
@@ -54,8 +53,8 @@ const StyringsBot = () => {
 
     const bot = {
       brutt,
-      melder : "Systemet",
-      datoBrudd : "",
+      melder: "Systemet",
+      datoBrudd: "",
       paragraf: "§ 0 Rettssamfunnets prinsipp",
       dato: new Date().toDateString(),
       beskrivelse,
@@ -65,27 +64,22 @@ const StyringsBot = () => {
 
     try {
       await set(ref(db, `boter/${id}`), bot);
+
+      // Reset form fields
       setBrutt([]);
       setBeskrivelse("");
       setEnheter(1);
       setSelectedBrutt("");
+
+      // Automatically close StyringsBot after submission
+      if (onClose) {
+        onClose();
+      }
     } catch (error) {
       console.error("Failed to submit data", error);
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleBruttSelectChange = (e) => {
-    const newBrutt = e.target.value;
-    if (newBrutt) {
-      setBrutt([...brutt, newBrutt]);
-    }
-    setSelectedBrutt("");
-  };
-
-  const handleRemoveBrutt = (playerToRemove) => {
-    setBrutt(brutt.filter((player) => player !== playerToRemove));
   };
 
   return (
@@ -97,7 +91,11 @@ const StyringsBot = () => {
             <br />
             <select
               value={selectedBrutt}
-              onChange={handleBruttSelectChange}
+              onChange={(e) => {
+                const newBrutt = e.target.value;
+                if (newBrutt) setBrutt([...brutt, newBrutt]);
+                setSelectedBrutt("");
+              }}
               required={brutt.length === 0}
             >
               <option value="" disabled>
@@ -119,7 +117,9 @@ const StyringsBot = () => {
               <button
                 className="remove_button"
                 type="button"
-                onClick={() => handleRemoveBrutt(selectedPlayer)}
+                onClick={() =>
+                  setBrutt(brutt.filter((p) => p !== selectedPlayer))
+                }
               >
                 fjern
               </button>
@@ -150,13 +150,22 @@ const StyringsBot = () => {
               type="number"
               value={enheter}
               inputMode="numeric"
-              pattern="[0-9]*"
-              onChange={(e) => setEnheter(Number(e.target.value))}
+              pattern="[-]?[0-9]*"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === "" || /^-?\d*$/.test(value)) {
+                  setEnheter(value);
+                }
+              }}
               required
             />
           </label>
           <br />
-          <button ref={submitButtonRef} type="submit" disabled={isSubmitting || submitCooldown}>
+          <button
+            ref={submitButtonRef}
+            type="submit"
+            disabled={isSubmitting || submitCooldown}
+          >
             {submitCooldown ? "Sender inn..." : "Meld justering"}
           </button>
           {submitCooldown && <p>Sender inn</p>}

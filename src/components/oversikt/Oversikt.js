@@ -73,27 +73,27 @@ const Oversikt = (props) => {
   const getSumForPlayer = useCallback(
     (player) => {
       let total = 0;
-  
+
       try {
         total = data
           .filter((entry) => {
             // Check if `entry.brutt` is valid and can use `includes`
-            if (!entry.brutt || typeof entry.brutt.includes !== 'function') {
-              console.log('Problematic entry:', entry);
+            if (!entry.brutt || typeof entry.brutt.includes !== "function") {
+              console.log("Problematic entry:", entry);
               return false;
             }
             return entry.brutt.includes(player) && entry.id < antallBoter;
           })
           .reduce((sum, entry) => sum + entry.enheter, 0);
       } catch (error) {
-        console.error('Error during filtering or reducing data:', error);
+        console.error("Error during filtering or reducing data:", error);
       }
-  
+
       const saksomkostningCount = saksData.filter(
         (entry) => entry.person === player
       ).length;
       total += saksomkostningCount;
-  
+
       if (total < 6) {
         total = 6;
       }
@@ -269,7 +269,7 @@ const Oversikt = (props) => {
 
   function confirmNewBotPeriode() {
     const db = getDatabase();
-    
+
     var userConfirmation = window.confirm(
       "Vil du fortsette inn i ny bot-periode? dette vil slette alle gamle bøter og legge til de nye som ble meldt inn etter rettsak. De gamle blir lasted ned for sikkhetskyld."
     );
@@ -320,7 +320,7 @@ const Oversikt = (props) => {
   const ferdigRegistertMedbrakte = async () => {
     const db = getDatabase();
     let newBots = []; // Array to hold new bots to be added
-  
+
     for (let player of players) {
       // Calculate the Ida/Helle bots and other necessary bots
       if (getSumForPlayer(player) > medbrakt[player] && medbrakt[player] < 30) {
@@ -332,11 +332,14 @@ const Oversikt = (props) => {
           getSumForPlayer(player) - medbrakt[player]
         } enhet(er) fra tidligere botfest`;
         let enheter = getSumForPlayer(player) - medbrakt[player] + 6;
-        let id = Math.max(newBots.length+1, data.length - antallBoter + newBots.length + 1);
+        let id = Math.max(
+          newBots.length + 1,
+          data.length - antallBoter + newBots.length + 1
+        );
         const idahelle = {
           brutt,
           melder,
-          datoBrudd : "",
+          datoBrudd: "",
           paragraf,
           dato,
           beskrivelse,
@@ -357,7 +360,10 @@ const Oversikt = (props) => {
           getSumForPlayer(player) - medbrakt[player]
         }`;
         let enheter = getSumForPlayer(player) - medbrakt[player];
-        let id = Math.max(newBots.length + 1, data.length - antallBoter + newBots.length + 1); // Updated ID calculation
+        let id = Math.max(
+          newBots.length + 1,
+          data.length - antallBoter + newBots.length + 1
+        ); // Updated ID calculation
         const restebot = {
           brutt,
           melder,
@@ -376,7 +382,7 @@ const Oversikt = (props) => {
 
     // Batch add all new bots to the database in one go
     const updates = {};
-    newBots.forEach(bot => {
+    newBots.forEach((bot) => {
       updates[`boter/${bot.id}`] = bot;
     });
 
@@ -386,9 +392,7 @@ const Oversikt = (props) => {
     } catch (error) {
       console.error("Failed to update data", error);
     }
-};
-
-  
+  };
 
   const handleMedbraktChange = (playerName, newValue) => {
     const updatedMedbrakt = {
@@ -465,7 +469,7 @@ const Oversikt = (props) => {
   async function restructureBoter() {
     const db = getDatabase();
     let boterCount;
-  
+
     // Step 1: Get the 'antall_boter' value (last trial ID)
     try {
       const snapshot = await get(ref(db, "antall_boter/0/antall"));
@@ -480,43 +484,45 @@ const Oversikt = (props) => {
       console.error("Error fetching antall_boter:", error);
       return;
     }
-  
+
     try {
       const boterRef = ref(db, "boter");
       const arkivRef = ref(db, "arkiv");
-  
+
       const boterSnapshot = await get(boterRef);
       if (boterSnapshot.exists()) {
         const boterData = boterSnapshot.val();
-  
+
         // Preserve the entry with ID 0 if it exists
         const entryZero = boterData[0] || null;
-  
+
         // Filter out entries for archiving (before last trial)
-        const entriesToArchive = Object.values(boterData)
-          .filter((entry) => entry.id < boterCount && entry.id !== 0); // Exclude ID 0
-  
+        const entriesToArchive = Object.values(boterData).filter(
+          (entry) => entry.id < boterCount && entry.id !== 0
+        ); // Exclude ID 0
+
         // Filter out entries to keep (new period entries)
-        const entriesToKeep = Object.values(boterData)
-          .filter((entry) => entry.id >= boterCount || entry.id === 0); // Keep ID 0
-  
+        const entriesToKeep = Object.values(boterData).filter(
+          (entry) => entry.id >= boterCount || entry.id === 0
+        ); // Keep ID 0
+
         // Move entries to archive
         for (const entry of entriesToArchive) {
           const newArkivEntryRef = push(arkivRef); // Get unique archive reference
           await set(newArkivEntryRef, entry);
         }
-  
+
         // Remove all boter entries
         await remove(boterRef);
-  
+
         // Step 3: Renumber and re-add kept entries
         let updatedBoterEntries = {};
-  
+
         // Add back the entry with ID 0 if it existed
         if (entryZero) {
           updatedBoterEntries[0] = entryZero;
         }
-  
+
         entriesToKeep
           .filter((entry) => entry.id !== 0) // Skip ID 0, as it's already added
           .forEach((entry, index) => {
@@ -524,22 +530,26 @@ const Oversikt = (props) => {
             entry.id = newID; // Update internal ID field
             updatedBoterEntries[newID] = entry; // Store with new ID as key
           });
-  
+
         // Add back to boter with updated IDs
         await set(boterRef, updatedBoterEntries);
-  
+
         // Update antall_boter to reflect the new starting point
-        await set(ref(db, "antall_boter/0"), { antall: Object.keys(updatedBoterEntries).length });
-  
+        await set(ref(db, "antall_boter/0"), {
+          antall: Object.keys(updatedBoterEntries).length,
+        });
+
         console.log("Boter restructuring and archive process complete.");
       } else {
         console.log("No boter found.");
       }
     } catch (error) {
-      console.error("Error during boter restructuring and archive process:", error);
+      console.error(
+        "Error during boter restructuring and archive process:",
+        error
+      );
     }
   }
-  
 
   useEffect(() => {
     const filterData = () => {
@@ -679,7 +689,6 @@ const Oversikt = (props) => {
             <RedigerSpillere />
           </>
         )}
-        
 
         <h2>Alle bøter</h2>
         <button
@@ -763,19 +772,29 @@ const Oversikt = (props) => {
               />
             </label>
           </div>
-
         )}
-        
+
         {props.botsjef && (
           <>
-            <button onClick={handleRettsak}>Rettsak</button>
-            <button onClick={toggleStyringsBot}>
-                {showStyringsBot ? "Lukk justering" : "Juster enkeltspillere"}
+            {/* Rettsak Button */}
+            <button onClick={handleRettsak}>
+              {rettsak === "rettsak" ? "Ferdig med rettsak" : "Rettsak"}
             </button>
-            {showStyringsBot && <StyringsBot />}
+
+            {/* Show the toggle button only when rettsak is active */}
+            {rettsak === "rettsak" && (
+              <>
+                <button onClick={toggleStyringsBot}>
+                  {showStyringsBot ? "Lukk justering" : "Juster enkeltspillere"}
+                </button>
+
+                {showStyringsBot && (
+                  <StyringsBot onClose={() => setShowStyringsBot(false)} />
+                )}
+              </>
+            )}
           </>
-      
-          )}
+        )}
 
         <div className="table-container">
           <table>
@@ -866,12 +885,6 @@ const Oversikt = (props) => {
             </tbody>
           </table>
         </div>
-        <br></br>
-        {props.botsjef && (
-          <button onClick={handleRettsak} style={{ fontSize: "18px" }}>
-            Ferdig med rettsak.
-          </button>
-        )}
       </>
     );
   } else {
