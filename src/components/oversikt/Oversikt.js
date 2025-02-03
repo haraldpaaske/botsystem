@@ -18,6 +18,7 @@ import {
   push,
 } from "firebase/database";
 import RedigerSpillere from "./RedigerSpillere";
+import StyringsBot from "./StyringsBot";
 
 const Oversikt = (props) => {
   const players = usePlayers();
@@ -46,6 +47,11 @@ const Oversikt = (props) => {
   });
   const [filteredData, setFilteredData] = useState([]);
   const reversedData = [...filteredData].reverse();
+  const [showStyringsBot, setShowStyringsBot] = useState(false);
+
+  const toggleStyringsBot = () => {
+    setShowStyringsBot((prev) => !prev); // Toggle the state
+  };
 
   const playersWithoutBoter = useMemo(
     () =>
@@ -330,6 +336,7 @@ const Oversikt = (props) => {
         const idahelle = {
           brutt,
           melder,
+          datoBrudd : "",
           paragraf,
           dato,
           beskrivelse,
@@ -459,12 +466,12 @@ const Oversikt = (props) => {
     const db = getDatabase();
     let boterCount;
   
-    // Step 1: Get the 'antall_boter' value
+    // Step 1: Get the 'antall_boter' value (last trial ID)
     try {
       const snapshot = await get(ref(db, "antall_boter/0/antall"));
       if (snapshot.exists()) {
-        boterCount = snapshot.val(); // assuming it's an integer
-        console.log(boterCount);
+        boterCount = snapshot.val(); // Last known trial ID
+        console.log("Last trial ID:", boterCount);
       } else {
         console.log("No antall_boter found");
         return;
@@ -482,67 +489,54 @@ const Oversikt = (props) => {
       if (boterSnapshot.exists()) {
         const boterData = boterSnapshot.val();
   
-        // Filter out the boter entries for archiving (0 to boterCount - 1)
-        const entriesToArchive = Object.keys(boterData)
-          .filter((key) => parseInt(key, 10) < boterCount && parseInt(key, 10) > 0)
-          .map((key) => boterData[key]);
+        // Preserve the entry with ID 0 if it exists
+        const entryZero = boterData[0] || null;
   
-        // Filter out the boter entries to keep (boterCount and onwards)
-        const entriesToKeep = Object.keys(boterData)
-          .filter((key) => parseInt(key, 10) >= boterCount || parseInt(key, 10) === 0)
-          .map((key) => boterData[key]);
+        // Filter out entries for archiving (before last trial)
+        const entriesToArchive = Object.values(boterData)
+          .filter((entry) => entry.id < boterCount && entry.id !== 0); // Exclude ID 0
   
-        // Copy entries to arkiv
+        // Filter out entries to keep (new period entries)
+        const entriesToKeep = Object.values(boterData)
+          .filter((entry) => entry.id >= boterCount || entry.id === 0); // Keep ID 0
+  
+        // Move entries to archive
         for (const entry of entriesToArchive) {
-          const newArkivEntryRef = push(arkivRef); // Get a new unique reference
+          const newArkivEntryRef = push(arkivRef); // Get unique archive reference
           await set(newArkivEntryRef, entry);
         }
   
-        // Step 2: Delete the boter
+        // Remove all boter entries
         await remove(boterRef);
   
-        // Step 3: Re-add the kept entries with new IDs and ensure ID 0 is preserved
-        if (entriesToKeep.length > 0) {
-          const newBoterEntries = { 0: entriesToKeep[0] }; // Initialize with the first entry
-          entriesToKeep.slice(1).forEach((entry, index) => {
-            // Start from 1 for the new IDs
-            newBoterEntries[index + 1] = entry;
-          });
+        // Step 3: Renumber and re-add kept entries
+        let updatedBoterEntries = {};
   
-          await set(boterRef, newBoterEntries);
-
-        } else {
-
-          let id= 0
-          const placeholderbot = {
-            brutt: [""],
-            melder: "",
-            datoBrudd: "",
-            paragraf: "",
-            dato: "",
-            beskrivelse: "",
-            enheter: 0,
-            id,
-          };
-    
-          try {
-            await set(ref(db, `boter/${id}`), placeholderbot);
-          } catch (error) {
-            console.error("Failed to place placeholder bot", error);
-          } 
-
-          console.log("No entries to keep.");
+        // Add back the entry with ID 0 if it existed
+        if (entryZero) {
+          updatedBoterEntries[0] = entryZero;
         }
   
-        console.log("Boter restructuring and copy to Arkiv complete.");
+        entriesToKeep
+          .filter((entry) => entry.id !== 0) // Skip ID 0, as it's already added
+          .forEach((entry, index) => {
+            const newID = index + 1; // Start numbering from 1
+            entry.id = newID; // Update internal ID field
+            updatedBoterEntries[newID] = entry; // Store with new ID as key
+          });
+  
+        // Add back to boter with updated IDs
+        await set(boterRef, updatedBoterEntries);
+  
+        // Update antall_boter to reflect the new starting point
+        await set(ref(db, "antall_boter/0"), { antall: Object.keys(updatedBoterEntries).length });
+  
+        console.log("Boter restructuring and archive process complete.");
       } else {
         console.log("No boter found.");
       }
     } catch (error) {
-      console.error(
-        "Error during boter restructuring and copy to Arkiv:",
-        error
-      );
+      console.error("Error during boter restructuring and archive process:", error);
     }
   }
   
@@ -769,8 +763,20 @@ const Oversikt = (props) => {
               />
             </label>
           </div>
+
         )}
-        {props.botsjef && <button onClick={handleRettsak}>Rettsak</button>}
+        
+        {props.botsjef && (
+          <>
+            <button onClick={handleRettsak}>Rettsak</button>
+            <button onClick={toggleStyringsBot}>
+                {showStyringsBot ? "Lukk justering" : "Juster enkeltspillere"}
+            </button>
+            {showStyringsBot && <StyringsBot />}
+          </>
+      
+          )}
+
         <div className="table-container">
           <table>
             <thead>
