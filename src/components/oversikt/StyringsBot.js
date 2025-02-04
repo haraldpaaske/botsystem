@@ -58,7 +58,7 @@ const StyringsBot = ({ onClose }) => {
       paragraf: "§ 0 Rettssamfunnets prinsipp",
       dato: new Date().toDateString(),
       beskrivelse,
-      enheter,
+      enheter: Number(enheter),
       id,
     };
 
