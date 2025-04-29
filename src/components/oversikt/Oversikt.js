@@ -271,7 +271,7 @@ const Oversikt = (props) => {
     const db = getDatabase();
 
     var userConfirmation = window.confirm(
-      "Vil du fortsette inn i ny bot-periode? dette vil slette alle gamle bøter og legge til de nye som ble meldt inn etter rettsak. De gamle blir lasted ned for sikkhetskyld."
+      "Vil du fortsette inn i ny bot-periode? dette vil slette alle gamle bøter og legge til de nye som ble meldt inn etter rettsak."
     );
 
     if (userConfirmation) {
@@ -305,7 +305,7 @@ const Oversikt = (props) => {
 
         set(ref(db, "antall_boter/0"), { antall: 10000 })
           .then(() => {
-            console.log("Data written successfully!");
+            console.log("D10000!");
           })
           .catch((error) => {
             console.error("Error writing to Firebase Database", error);
@@ -432,40 +432,6 @@ const Oversikt = (props) => {
       });
   };
 
-  const handleDownload = () => {
-    const blob = new Blob([jsonDataBoter], { type: "application/json" });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = `bot-data(${dato[1]}-${dato[3]}).json`;
-
-    document.body.appendChild(a);
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-  };
-
-  const handleDownloadFull = () => {
-    const blob = new Blob([jsonDataFull], { type: "application/json" });
-    const url = window.URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.style.display = "none";
-    a.href = url;
-    a.download = `Backup-data(${dato[1]}-${dato[3]}).json`;
-
-    document.body.appendChild(a);
-    a.click();
-
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-
-    restructureBoter();
-  };
-
   async function restructureBoter() {
     const db = getDatabase();
     let boterCount;
@@ -475,7 +441,7 @@ const Oversikt = (props) => {
       const snapshot = await get(ref(db, "antall_boter/0/antall"));
       if (snapshot.exists()) {
         boterCount = snapshot.val(); // Last known trial ID
-        console.log("Last trial ID:", boterCount);
+        console.log("Last rettsak ID:", boterCount);
       } else {
         console.log("No antall_boter found");
         return;
@@ -535,9 +501,9 @@ const Oversikt = (props) => {
         await set(boterRef, updatedBoterEntries);
 
         // Update antall_boter to reflect the new starting point
-        await set(ref(db, "antall_boter/0"), {
-          antall: Object.keys(updatedBoterEntries).length,
-        });
+        // await set(ref(db, "antall_boter/0"), {
+        //   antall: Object.keys(updatedBoterEntries).length,
+        // });
 
         console.log("Boter restructuring and archive process complete.");
       } else {
