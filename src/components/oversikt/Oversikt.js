@@ -520,38 +520,41 @@ const Oversikt = (props) => {
   useEffect(() => {
     const filterData = () => {
       const filtered = data.filter((entry) => {
-        const matchesForbryter = Array.isArray(entry.brutt)
-          ? entry.brutt
-              .join(", ")
-              .toLowerCase()
-              .includes(filterCriteria.forbryter.toLowerCase())
-          : entry.brutt
-              .toLowerCase()
-              .includes(filterCriteria.forbryter.toLowerCase());
+        // 1) normalize each field
+        const bruttArr = Array.isArray(entry.brutt) ? entry.brutt : [];
+        const melder = entry.melder ?? "";
+        const paragraf = entry.paragraf ?? "";
+        const datoBrudd = entry.datoBrudd ?? "";
+        const beskrivelse = entry.beskrivelse ?? "";
+        const enheterStr = entry.enheter != null ? String(entry.enheter) : "";
 
-        const matchesInnsender = entry.melder
+        // 2) do your matching
+        const matchesForbryter = bruttArr
+          .join(", ")
+          .toLowerCase()
+          .includes(filterCriteria.forbryter.toLowerCase());
+
+        const matchesInnsender = melder
           .toLowerCase()
           .includes(filterCriteria.innsender.toLowerCase());
 
         const matchesParagraf =
           filterCriteria.paragraf === "" ||
-          entry.paragraf === filterCriteria.paragraf;
+          paragraf === filterCriteria.paragraf;
 
         const matchesDato =
           filterCriteria.dato === "" ||
-          entry.datoBrudd
-            .toLowerCase()
-            .includes(filterCriteria.dato.toLowerCase());
+          datoBrudd.toLowerCase().includes(filterCriteria.dato.toLowerCase());
 
         const matchesBeskrivelse =
           filterCriteria.beskrivelse === "" ||
-          entry.beskrivelse
+          beskrivelse
             .toLowerCase()
             .includes(filterCriteria.beskrivelse.toLowerCase());
 
         const matchesEnheter =
           filterCriteria.enheter === "" ||
-          entry.enheter.toString() === filterCriteria.enheter;
+          enheterStr === filterCriteria.enheter;
 
         return (
           matchesForbryter &&
@@ -567,7 +570,7 @@ const Oversikt = (props) => {
     };
 
     filterData();
-  }, [filterCriteria, data]); // Assuming `data` is your original dataset
+  }, [filterCriteria, data]);
 
   const handleInputChange = (field, value) => {
     setFilterCriteria((prevFilterCriteria) => ({

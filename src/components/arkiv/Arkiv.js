@@ -42,34 +42,40 @@ const Arkiv = () => {
 
   const filterData = () => {
     const filtered = arkivData.filter((entry) => {
-      const matchesForbryter = entry.brutt
+      // 1) Safe‐guard every field
+      const bruttArr = Array.isArray(entry.brutt) ? entry.brutt : [];
+      const melder = entry.melder ?? "";
+      const p = entry.paragraf ?? "";
+      const datoB = entry.datoBrudd ?? "";
+      const beskriv = entry.beskrivelse ?? "";
+      const enhet = entry.enheter != null ? String(entry.enheter) : "";
+
+      // 2) Perform your checks
+      const matchesForbryter = bruttArr
         .join(", ")
         .toLowerCase()
         .includes(filterCriteria.forbryter.toLowerCase());
 
-      const matchesInnsender = entry.melder
+      const matchesInnsender = melder
         .toLowerCase()
         .includes(filterCriteria.innsender.toLowerCase());
 
-      const matchesParagraf = entry.paragraf
+      const matchesParagraf = p
         .toLowerCase()
         .includes(filterCriteria.paragraf.toLowerCase());
 
       const matchesDato =
         filterCriteria.dato === "" ||
-        entry.datoBrudd
-          .toLowerCase()
-          .includes(filterCriteria.dato.toLowerCase());
+        datoB.toLowerCase().includes(filterCriteria.dato.toLowerCase());
 
       const matchesBeskrivelse =
         filterCriteria.beskrivelse === "" ||
-        entry.beskrivelse
+        beskriv
           .toLowerCase()
           .includes(filterCriteria.beskrivelse.toLowerCase());
 
       const matchesEnheter =
-        filterCriteria.enheter === "" ||
-        entry.enheter.toString() === filterCriteria.enheter;
+        filterCriteria.enheter === "" || enhet === filterCriteria.enheter;
 
       return (
         matchesForbryter &&
